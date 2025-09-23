@@ -18,7 +18,7 @@ class Application
         $this->config = new Config();
         $this->database = new Database($this->config);
         $this->auth = new Auth($this->database);
-        // $this->theme = new Theme(); // TODO: Fix Theme class loading
+        $this->theme = new Theme();
         $this->router = new Router($this->auth);
     }
 

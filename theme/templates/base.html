@@ -8,20 +8,8 @@
     <meta name="description" content="<?= $description ?? 'Plateforme e-learning corporate avec thème claymorphism' ?>">
     <meta name="robots" content="<?= $robots ?? 'index, follow' ?>">
     
-    <!-- CSS du thème -->
-    <link rel="stylesheet" href="theme/css/variables.css">
-    <link rel="stylesheet" href="theme/css/reset.css">
-    <link rel="stylesheet" href="theme/css/claymorphism.css">
-    <link rel="stylesheet" href="theme/css/components/buttons.css">
-    <link rel="stylesheet" href="theme/css/components/forms.css">
-    <link rel="stylesheet" href="theme/css/components/cards.css">
-    
-    <!-- CSS supplémentaires -->
-    <?php if (isset($extra_css)): ?>
-        <?php foreach ($extra_css as $css): ?>
-            <link rel="stylesheet" href="<?= $css ?>">
-        <?php endforeach; ?>
-    <?php endif; ?>
+    <!-- CSS du thème centralisé -->
+    <?= $theme->renderCSSLinks($extra_css ?? []) ?>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="theme/icons/favicon.ico">
@@ -145,15 +133,8 @@
         </div>
     <?php endif; ?>
     
-    <!-- JavaScript du thème -->
-    <script src="theme/js/theme.js"></script>
-    
-    <!-- JavaScript supplémentaires -->
-    <?php if (isset($extra_js)): ?>
-        <?php foreach ($extra_js as $js): ?>
-            <script src="<?= $js ?>"></script>
-        <?php endforeach; ?>
-    <?php endif; ?>
+    <!-- JavaScript du thème centralisé -->
+    <?= $theme->renderJSLinks($extra_js ?? []) ?>
     
     <!-- JavaScript inline -->
     <?php if (isset($inline_js)): ?>

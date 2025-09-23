@@ -54,6 +54,7 @@ class HomeController extends View
         
         // Ajout du contenu au data pour le template de base
         $data['content'] = $content;
+        $data['theme'] = $this->theme;
         
         // Rendu avec le template de base qui contient tous les styles
         $this->render('theme/templates/base.html', $data);

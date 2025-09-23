@@ -10,6 +10,7 @@ abstract class View
     protected $database;
     protected $auth;
     protected $config;
+    protected $theme;
 
     public function __construct()
     {
@@ -17,6 +18,7 @@ abstract class View
         $this->database = $app->getDatabase();
         $this->auth = $app->getAuth();
         $this->config = $app->getConfig();
+        $this->theme = $app->getTheme();
     }
 
     protected function render($template, $data = [])
