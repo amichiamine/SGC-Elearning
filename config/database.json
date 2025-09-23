@@ -1,0 +1,22 @@
+{
+    "type": "sqlite",
+    "path": "database/elearning.db",
+    "options": {
+        "create_if_not_exists": true,
+        "foreign_keys": true
+    },
+    "mysql": {
+        "host": "localhost",
+        "database": "elearning",
+        "username": "",
+        "password": "",
+        "charset": "utf8mb4"
+    },
+    "postgresql": {
+        "host": "localhost",
+        "database": "elearning",
+        "username": "",
+        "password": "",
+        "port": 5432
+    }
+}

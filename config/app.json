@@ -1,0 +1,19 @@
+{
+    "name": "SGC E-Learning Platform",
+    "version": "1.0.0",
+    "debug": true,
+    "timezone": "Europe/Paris",
+    "language": "fr",
+    "url": "http://localhost:5000",
+    "session": {
+        "name": "sgc_session",
+        "lifetime": 7200,
+        "secure": false,
+        "httponly": true
+    },
+    "security": {
+        "csrf_protection": true,
+        "password_min_length": 6,
+        "session_regenerate": true
+    }
+}

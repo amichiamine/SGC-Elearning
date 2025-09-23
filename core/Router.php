@@ -67,7 +67,9 @@ class Router
 
     private function loadView($route)
     {
-        $viewClass = "Views\\{$route['view']}\\{$route['view']}View";
+        $viewParts = explode('\\', $route['view']);
+        $viewName = end($viewParts);
+        $viewClass = "Views\\{$route['view']}\\{$viewName}View";
         $method = $route['method'];
 
         if (class_exists($viewClass)) {

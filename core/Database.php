@@ -64,7 +64,7 @@ class Database
                     role_id INTEGER NOT NULL,
                     avatar VARCHAR(255),
                     bio TEXT,
-                    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+                    status VARCHAR(20) DEFAULT 'active' CHECK(status IN ('active', 'inactive', 'suspended')),
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     last_login DATETIME,

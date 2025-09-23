@@ -23,5 +23,9 @@ $autoloader->register();
 
 // Initialisation de l'application
 $app = new Core\Application();
+
+// Rendre l'app accessible globalement pour les vues
+$GLOBALS['app'] = $app;
+
 $app->run();
 ?>
