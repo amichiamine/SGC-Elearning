@@ -1,0 +1,76 @@
+{
+    "buttons": {
+        "primary": {
+            "background": "linear-gradient(135deg, #4A90E2 0%, #7ED4AD 100%)",
+            "color": "#FFFFFF",
+            "border": "none",
+            "border_radius": "0.75rem",
+            "padding": "0.75rem 1.5rem",
+            "font_weight": 500,
+            "transition": "all 0.3s ease-out",
+            "shadow": "0 8px 32px 0 rgba(74, 144, 226, 0.25)",
+            "hover": {
+                "transform": "translateY(-2px)",
+                "shadow": "0 12px 40px 0 rgba(74, 144, 226, 0.35)"
+            }
+        },
+        "secondary": {
+            "background": "rgba(255, 255, 255, 0.15)",
+            "color": "#4A90E2",
+            "border": "1px solid rgba(74, 144, 226, 0.3)",
+            "backdrop_filter": "blur(15px)"
+        },
+        "danger": {
+            "background": "linear-gradient(135deg, #DC3545 0%, #C82333 100%)",
+            "color": "#FFFFFF"
+        }
+    },
+    "cards": {
+        "default": {
+            "background": "rgba(255, 255, 255, 0.15)",
+            "backdrop_filter": "blur(15px)",
+            "border_radius": "1.25rem",
+            "border": "1px solid rgba(255, 255, 255, 0.2)",
+            "shadow": "0 12px 40px 0 rgba(74, 144, 226, 0.25)",
+            "padding": "1.5rem",
+            "transition": "all 0.3s ease-out"
+        },
+        "hover_effect": {
+            "transform": "translateY(-4px)",
+            "shadow": "0 16px 48px 0 rgba(74, 144, 226, 0.35)"
+        }
+    },
+    "forms": {
+        "input": {
+            "background": "rgba(255, 255, 255, 0.1)",
+            "border": "1px solid rgba(255, 255, 255, 0.2)",
+            "border_radius": "0.75rem",
+            "padding": "0.75rem 1rem",
+            "backdrop_filter": "blur(10px)",
+            "color": "#2C3E50",
+            "placeholder_color": "#8E9AAF"
+        },
+        "focus": {
+            "border_color": "#4A90E2",
+            "outline": "none",
+            "shadow": "0 0 0 3px rgba(74, 144, 226, 0.1)"
+        }
+    },
+    "navigation": {
+        "navbar": {
+            "background": "rgba(255, 255, 255, 0.1)",
+            "backdrop_filter": "blur(20px)",
+            "border_bottom": "1px solid rgba(255, 255, 255, 0.1)"
+        },
+        "nav_link": {
+            "color": "#FFFFFF",
+            "padding": "0.5rem 1rem",
+            "border_radius": "0.5rem",
+            "transition": "all 0.3s ease-out"
+        },
+        "nav_link_hover": {
+            "background": "rgba(255, 255, 255, 0.1)",
+            "color": "#4A90E2"
+        }
+    }
+}
