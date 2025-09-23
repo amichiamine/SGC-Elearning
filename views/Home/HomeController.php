@@ -11,7 +11,7 @@ use Core\Database;
  */
 class HomeController extends View
 {
-    private Database $database;
+    protected $database;
     
     public function __construct(Database $database)
     {

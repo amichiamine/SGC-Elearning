@@ -69,11 +69,12 @@ class Router
     {
         $viewParts = explode('\\', $route['view']);
         $viewName = end($viewParts);
-        $viewClass = "Views\\{$route['view']}\\{$viewName}View";
+        $viewClass = "Views\\{$route['view']}\\{$viewName}Controller";
         $method = $route['method'];
 
         if (class_exists($viewClass)) {
-            $view = new $viewClass();
+            global $app;
+            $view = new $viewClass($app->getDatabase());
             if (method_exists($view, $method)) {
                 $view->$method();
                 return;
