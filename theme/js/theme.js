@@ -67,7 +67,6 @@ class SGCTheme {
      */
     initComponents() {
         this.initButtons();
-        this.initTooltips();
         this.initDropdowns();
     }
 
@@ -499,6 +498,6 @@ const animationStyles = `
 `;
 
 // Injecter les styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = animationStyles;
-document.head.appendChild(styleSheet);
+const themeStyleSheet = document.createElement('style');
+themeStyleSheet.textContent = animationStyles;
+document.head.appendChild(themeStyleSheet);
