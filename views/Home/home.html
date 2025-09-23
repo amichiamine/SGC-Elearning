@@ -1,59 +1,236 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title) ?></title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #4A90E2 0%, #7ED4AD 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 12px 40px 0 rgba(74, 144, 226, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        h1 {
-            margin: 0 0 20px 0;
-            font-size: 2.5em;
-            font-weight: 300;
-        }
-        p {
-            margin: 0;
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        .status {
-            margin-top: 30px;
-            padding: 15px;
-            background: rgba(126, 212, 173, 0.3);
-            border-radius: 10px;
-            font-weight: 500;
-            border: 1px solid rgba(126, 212, 173, 0.4);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1><?= htmlspecialchars($title) ?></h1>
-        <p><?= htmlspecialchars($message) ?></p>
-        <div class="status">
-            ✅ Infrastructure de base configurée<br>
-            ✅ Système modulaire opérationnel<br>
-            ✅ Prêt pour la Phase 1 du développement
+<!-- Template de la page d'accueil SGC E-Learning -->
+
+<!-- Section Hero / Bannière principale -->
+<section class="hero-section clay-card">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title"><?= htmlspecialchars($hero_data['title']) ?></h1>
+            <h2 class="hero-subtitle"><?= htmlspecialchars($hero_data['subtitle']) ?></h2>
+            <p class="hero-description"><?= htmlspecialchars($hero_data['description']) ?></p>
+            <div class="hero-actions">
+                <a href="<?= $hero_data['cta_url'] ?>" class="btn btn-primary btn-xl">
+                    <span class="icon icon-play"></span>
+                    <?= htmlspecialchars($hero_data['cta_text']) ?>
+                </a>
+                <a href="/courses" class="btn btn-outline btn-xl">
+                    <span class="icon icon-courses"></span>
+                    Parcourir les cours
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-image clay-float">
+                <!-- Placeholder pour image ou vidéo -->
+                <div class="hero-placeholder">
+                    <span class="icon icon-xl">🎓</span>
+                </div>
+            </div>
         </div>
     </div>
-</body>
-</html>
+    
+    <!-- Statistiques rapides -->
+    <div class="hero-stats">
+        <?php foreach ($statistics as $stat): ?>
+            <div class="stat-item clay-card">
+                <div class="stat-icon">
+                    <span class="icon icon-<?= $stat['icon'] ?> icon-2xl"></span>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number"><?= $stat['number'] ?></div>
+                    <div class="stat-label"><?= $stat['label'] ?></div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<!-- Section Annonces Importantes -->
+<?php if (!empty($announcements)): ?>
+<section class="announcements-section">
+    <div class="container">
+        <div class="announcements-slider">
+            <?php foreach ($announcements as $announcement): ?>
+                <div class="announcement-item clay-card announcement-<?= $announcement['type'] ?>">
+                    <div class="announcement-icon">
+                        <span class="icon icon-info"></span>
+                    </div>
+                    <div class="announcement-content">
+                        <h3 class="announcement-title"><?= htmlspecialchars($announcement['title']) ?></h3>
+                        <p class="announcement-text"><?= htmlspecialchars($announcement['content']) ?></p>
+                    </div>
+                    <div class="announcement-action">
+                        <a href="<?= $announcement['url'] ?>" class="btn btn-sm btn-secondary">En savoir plus</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- Section Cours Mis en Avant -->
+<section class="featured-courses-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Cours Populaires</h2>
+            <p class="section-subtitle">Découvrez nos formations les plus appréciées par nos apprenants</p>
+            <div class="section-actions">
+                <a href="/courses" class="btn btn-outline">
+                    <span class="icon icon-courses"></span>
+                    Voir tous les cours
+                </a>
+            </div>
+        </div>
+        
+        <div class="courses-grid">
+            <?php foreach ($featured_courses as $course): ?>
+                <div class="course-card clay-card">
+                    <div class="course-image">
+                        <img src="<?= $course['image'] ?>" alt="<?= htmlspecialchars($course['title']) ?>" loading="lazy">
+                        <div class="course-badge course-level-<?= strtolower($course['level']) ?>">
+                            <?= $course['level'] ?>
+                        </div>
+                    </div>
+                    
+                    <div class="course-content">
+                        <div class="course-category"><?= htmlspecialchars($course['category']) ?></div>
+                        <h3 class="course-title"><?= htmlspecialchars($course['title']) ?></h3>
+                        <p class="course-description"><?= htmlspecialchars($course['description']) ?></p>
+                        
+                        <div class="course-instructor">
+                            <span class="icon icon-profile"></span>
+                            <?= htmlspecialchars($course['instructor_name']) ?>
+                        </div>
+                        
+                        <div class="course-meta">
+                            <div class="course-duration">
+                                <span class="icon icon-clock"></span>
+                                <?= $course['duration'] ?>
+                            </div>
+                            <div class="course-rating">
+                                <span class="icon icon-star"></span>
+                                <?= $course['rating'] ?> (<?= number_format($course['students_count']) ?>)
+                            </div>
+                        </div>
+                        
+                        <div class="course-footer">
+                            <div class="course-price"><?= $course['price'] ?></div>
+                            <a href="/courses/<?= $course['id'] ?>" class="btn btn-primary">
+                                <span class="icon icon-play"></span>
+                                Commencer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- Section Formateurs Experts -->
+<section class="featured-instructors-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Nos Experts Formateurs</h2>
+            <p class="section-subtitle">Apprenez auprès des meilleurs professionnels de leur domaine</p>
+        </div>
+        
+        <div class="instructors-grid">
+            <?php foreach ($featured_instructors as $instructor): ?>
+                <div class="instructor-card clay-card">
+                    <div class="instructor-avatar">
+                        <img src="<?= $instructor['avatar'] ?>" alt="<?= htmlspecialchars($instructor['name']) ?>" loading="lazy">
+                    </div>
+                    
+                    <div class="instructor-content">
+                        <h3 class="instructor-name"><?= htmlspecialchars($instructor['name']) ?></h3>
+                        <div class="instructor-title"><?= htmlspecialchars($instructor['title']) ?></div>
+                        <p class="instructor-bio"><?= htmlspecialchars($instructor['bio']) ?></p>
+                        
+                        <div class="instructor-specialties">
+                            <?php foreach ($instructor['specialties'] as $specialty): ?>
+                                <span class="specialty-tag"><?= htmlspecialchars($specialty) ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <div class="instructor-stats">
+                            <div class="instructor-stat">
+                                <div class="stat-value"><?= $instructor['courses_count'] ?></div>
+                                <div class="stat-label">Cours</div>
+                            </div>
+                            <div class="instructor-stat">
+                                <div class="stat-value"><?= number_format($instructor['students_count']) ?></div>
+                                <div class="stat-label">Étudiants</div>
+                            </div>
+                            <div class="instructor-stat">
+                                <div class="stat-value"><?= $instructor['rating'] ?></div>
+                                <div class="stat-label">Note</div>
+                            </div>
+                        </div>
+                        
+                        <div class="instructor-actions">
+                            <a href="/instructors/<?= $instructor['id'] ?>" class="btn btn-secondary">
+                                <span class="icon icon-profile"></span>
+                                Voir le profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- Section Témoignages -->
+<section class="testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Ce que disent nos clients</h2>
+            <p class="section-subtitle">Découvrez les retours de nos apprenants et partenaires</p>
+        </div>
+        
+        <div class="testimonials-slider">
+            <?php foreach ($testimonials as $testimonial): ?>
+                <div class="testimonial-card clay-card">
+                    <div class="testimonial-rating">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="icon icon-star <?= $i <= $testimonial['rating'] ? 'star-filled' : 'star-empty' ?>"></span>
+                        <?php endfor; ?>
+                    </div>
+                    
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">"<?= htmlspecialchars($testimonial['content']) ?>"</p>
+                    </div>
+                    
+                    <div class="testimonial-author">
+                        <img src="<?= $testimonial['avatar'] ?>" alt="<?= htmlspecialchars($testimonial['name']) ?>" class="author-avatar" loading="lazy">
+                        <div class="author-info">
+                            <div class="author-name"><?= htmlspecialchars($testimonial['name']) ?></div>
+                            <div class="author-position"><?= htmlspecialchars($testimonial['position']) ?></div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- Section Call-to-Action Final -->
+<section class="cta-section clay-card">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Prêt à développer vos compétences ?</h2>
+            <p class="cta-subtitle">Rejoignez plus de 12,000 apprenants qui font confiance à SGC E-Learning</p>
+            <div class="cta-actions">
+                <a href="/register" class="btn btn-primary btn-xl">
+                    <span class="icon icon-add"></span>
+                    Créer mon compte
+                </a>
+                <a href="/contact" class="btn btn-outline btn-xl">
+                    <span class="icon icon-info"></span>
+                    Nous contacter
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
