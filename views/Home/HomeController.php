@@ -46,8 +46,17 @@ class HomeController extends View
             'statistics' => $this->getStatistics()
         ];
 
-        // Rendu du template home avec les données
-        $this->render('views/Home/home.html', $data);
+        // Rendu du contenu home
+        ob_start();
+        extract($data);
+        include 'views/Home/home.html';
+        $content = ob_get_clean();
+        
+        // Ajout du contenu au data pour le template de base
+        $data['content'] = $content;
+        
+        // Rendu avec le template de base qui contient tous les styles
+        $this->render('theme/templates/base.html', $data);
     }
 
     /**
