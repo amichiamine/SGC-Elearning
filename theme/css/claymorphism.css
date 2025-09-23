@@ -55,7 +55,8 @@
   min-height: 100vh;
   padding: var(--spacing-4);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .clay-container::before {
@@ -131,6 +132,28 @@
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+/* Navigation Card Style - Style claymorphism complet pour header */
+.clay-nav-card {
+  background: var(--glass-light);
+  backdrop-filter: blur(var(--blur-xl));
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-medium);
+  margin: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4) 0;
+  position: sticky;
+  top: var(--spacing-4);
+  z-index: 100;
+  transition: var(--transition-normal);
+}
+
+.clay-nav-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-strong);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .clay-nav .container {
