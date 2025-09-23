@@ -123,6 +123,40 @@ class SGCTheme {
     }
 
     /**
+     * Initialisation des dropdowns
+     */
+    initDropdowns() {
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            if (toggle && menu) {
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Fermer tous les autres dropdowns
+                    document.querySelectorAll('.dropdown').forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle le dropdown actuel
+                    dropdown.classList.toggle('active');
+                });
+            }
+        });
+        
+        // Fermer les dropdowns en cliquant ailleurs
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+        });
+    }
+
+    /**
      * Initialisation de la navigation
      */
     initNavigation() {
