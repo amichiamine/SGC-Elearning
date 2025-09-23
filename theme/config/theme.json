@@ -1,0 +1,27 @@
+{
+    "name": "SGC Corporate Claymorphism",
+    "version": "1.0.0",
+    "description": "Thème corporate claymorphism avec palette bleu ciel et vert menthe",
+    "author": "SGC E-Learning Platform",
+    "primary_colors": {
+        "sky_blue": "#4A90E2",
+        "mint_green": "#7ED4AD"
+    },
+    "style": "claymorphism",
+    "corporate": true,
+    "responsive": true,
+    "components_included": [
+        "buttons", "forms", "cards", "navigation", 
+        "modals", "tables", "alerts", "badges", 
+        "carousel", "banners"
+    ],
+    "layouts_included": [
+        "base", "admin", "student", "instructor", 
+        "public", "auth"
+    ],
+    "animations": {
+        "enabled": true,
+        "duration": "300ms",
+        "easing": "ease-out"
+    }
+}
