@@ -1,0 +1,153 @@
+/* Reset CSS moderne pour le thème SGC */
+
+/* Reset de base */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Amélioration du rendu des polices */
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Media par défaut */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Éléments de formulaire */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* Prévention des débordements de texte */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* Conteneurs racine */
+#root, #__next {
+  isolation: isolate;
+}
+
+/* Styles de base pour les listes */
+ul, ol {
+  list-style: none;
+}
+
+/* Liens par défaut */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Boutons par défaut */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Éléments inline */
+strong, b {
+  font-weight: var(--font-weight-bold);
+}
+
+em, i {
+  font-style: italic;
+}
+
+/* Code */
+code, pre, kbd, samp {
+  font-family: var(--font-family-mono);
+}
+
+/* Formulaires améliorés */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+textarea,
+select {
+  appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+/* Focus visible amélioré */
+:focus-visible {
+  outline: 2px solid var(--color-sky-blue);
+  outline-offset: 2px;
+}
+
+/* Scroll smooth par défaut */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Suppression du contour sur les éléments focalisés par la souris */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Amélioration de l'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Amélioration du contraste pour les modes sombres */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Amélioration pour l'impression */
+@media print {
+  *, *::before, *::after {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a, a:visited {
+    text-decoration: underline;
+  }
+  
+  img {
+    page-break-inside: avoid;
+  }
+  
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  h2, h3 {
+    page-break-after: avoid;
+  }
+}

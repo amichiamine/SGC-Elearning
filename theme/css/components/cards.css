@@ -1,0 +1,380 @@
+/* Système de cartes claymorphism SGC */
+
+/* Carte de base */
+.card {
+  background: var(--glass-light);
+  backdrop-filter: blur(var(--blur-xl));
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-medium);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  color: var(--color-white);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-strong);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Contenu de la carte */
+.card-header {
+  padding: var(--spacing-6) var(--spacing-6) var(--spacing-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-body {
+  padding: var(--spacing-6);
+}
+
+.card-footer {
+  padding: var(--spacing-4) var(--spacing-6) var(--spacing-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Titres de carte */
+.card-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--spacing-2) 0;
+  color: var(--color-white);
+}
+
+.card-subtitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  margin: 0 0 var(--spacing-4) 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.card-text {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-4);
+}
+
+.card-text:last-child {
+  margin-bottom: 0;
+}
+
+/* Variantes de cartes */
+.card-elevated {
+  box-shadow: var(--shadow-strong);
+  background: var(--glass-medium);
+}
+
+.card-elevated:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 56px 0 rgba(74, 144, 226, 0.4);
+}
+
+.card-flat {
+  box-shadow: none;
+  border: 1px solid var(--color-border-light);
+}
+
+.card-outline {
+  background: transparent;
+  border: 2px solid var(--color-border-light);
+  backdrop-filter: none;
+}
+
+/* Cartes colorées */
+.card-primary {
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.3) 0%, rgba(126, 212, 173, 0.3) 100%);
+  border-color: var(--color-sky-blue);
+}
+
+.card-success {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
+  border-color: var(--color-success);
+}
+
+.card-danger {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(200, 35, 51, 0.2) 100%);
+  border-color: var(--color-danger);
+}
+
+.card-warning {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 152, 0, 0.2) 100%);
+  border-color: var(--color-warning);
+}
+
+.card-info {
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.2) 0%, rgba(74, 144, 226, 0.2) 100%);
+  border-color: var(--color-info);
+}
+
+/* Cartes avec image */
+.card-img-top {
+  width: 100%;
+  border-top-left-radius: calc(var(--radius-2xl) - 1px);
+  border-top-right-radius: calc(var(--radius-2xl) - 1px);
+}
+
+.card-img-bottom {
+  width: 100%;
+  border-bottom-left-radius: calc(var(--radius-2xl) - 1px);
+  border-bottom-right-radius: calc(var(--radius-2xl) - 1px);
+}
+
+.card-img-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: var(--spacing-6);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+  border-radius: calc(var(--radius-2xl) - 1px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Cartes horizontales */
+.card-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.card-horizontal .card-img-left {
+  width: 200px;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: calc(var(--radius-2xl) - 1px);
+}
+
+.card-horizontal .card-body {
+  flex: 1;
+}
+
+/* Groupes de cartes */
+.card-group {
+  display: flex;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.card-deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-6);
+}
+
+.card-columns {
+  columns: 3;
+  column-gap: var(--spacing-6);
+  break-inside: avoid;
+}
+
+/* Cartes de cours */
+.course-card {
+  background: var(--glass-light);
+  backdrop-filter: blur(var(--blur-xl));
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-medium);
+  transition: var(--transition-normal);
+  overflow: hidden;
+  position: relative;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-strong);
+}
+
+.course-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-top-left-radius: calc(var(--radius-2xl) - 1px);
+  border-top-right-radius: calc(var(--radius-2xl) - 1px);
+}
+
+.course-card-badge {
+  position: absolute;
+  top: var(--spacing-3);
+  right: var(--spacing-3);
+  background: var(--gradient-primary);
+  color: var(--color-white);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.course-card-content {
+  padding: var(--spacing-5);
+}
+
+.course-card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-2);
+  color: var(--color-white);
+}
+
+.course-card-instructor {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--spacing-3);
+}
+
+.course-card-description {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: var(--spacing-4);
+  line-height: var(--line-height-relaxed);
+}
+
+.course-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--spacing-4);
+}
+
+.course-card-price {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-mint-green);
+}
+
+/* Cartes de formateur */
+.instructor-card {
+  text-align: center;
+  background: var(--glass-light);
+  backdrop-filter: blur(var(--blur-xl));
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-medium);
+  padding: var(--spacing-6);
+  transition: var(--transition-normal);
+}
+
+.instructor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-strong);
+}
+
+.instructor-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto var(--spacing-4);
+  border: 3px solid var(--color-white);
+  object-fit: cover;
+}
+
+.instructor-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-1);
+}
+
+.instructor-title {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--spacing-3);
+}
+
+.instructor-bio {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-4);
+}
+
+.instructor-stats {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  padding-top: var(--spacing-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.instructor-stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-mint-green);
+  display: block;
+}
+
+.instructor-stat-label {
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Cartes d'état vides */
+.empty-card {
+  text-align: center;
+  padding: var(--spacing-12) var(--spacing-6);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-card-icon {
+  font-size: var(--font-size-6xl);
+  margin-bottom: var(--spacing-4);
+  opacity: 0.3;
+}
+
+.empty-card-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  margin-bottom: var(--spacing-2);
+}
+
+.empty-card-text {
+  margin-bottom: var(--spacing-6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-horizontal {
+    flex-direction: column;
+  }
+  
+  .card-horizontal .card-img-left {
+    width: 100%;
+    border-radius: calc(var(--radius-2xl) - 1px) calc(var(--radius-2xl) - 1px) 0 0;
+  }
+  
+  .card-columns {
+    columns: 1;
+  }
+  
+  .card-deck {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-group {
+    flex-direction: column;
+  }
+  
+  .instructor-stats {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+}
