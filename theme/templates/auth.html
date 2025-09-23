@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><?= $title ?? 'Authentification - SGC E-Learning' ?></title>
+    <meta name="description" content="<?= $description ?? 'Connexion ou inscription à la plateforme SGC E-Learning' ?>">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- CSS du thème -->
+    <link rel="stylesheet" href="theme/css/variables.css">
+    <link rel="stylesheet" href="theme/css/reset.css">
+    <link rel="stylesheet" href="theme/css/claymorphism.css">
+    <link rel="stylesheet" href="theme/css/components/buttons.css">
+    <link rel="stylesheet" href="theme/css/components/forms.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="theme/icons/favicon.ico">
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<body class="clay-container">
+    <div class="clay-content">
+        <!-- Container d'authentification -->
+        <div class="auth-container">
+            <div class="auth-wrapper clay">
+                <!-- Logo/En-tête -->
+                <div class="auth-header">
+                    <div class="auth-logo">
+                        <h1 class="auth-title">SGC E-Learning</h1>
+                        <p class="auth-subtitle">Plateforme d'apprentissage corporate</p>
+                    </div>
+                </div>
+                
+                <!-- Formulaire principal -->
+                <div class="auth-form">
+                    <?= $content ?>
+                </div>
+                
+                <!-- Liens alternatifs -->
+                <?php if (isset($auth_links) && !empty($auth_links)): ?>
+                    <div class="auth-links">
+                        <?php foreach ($auth_links as $link): ?>
+                            <a href="<?= $link['url'] ?>" class="auth-link">
+                                <?= htmlspecialchars($link['text']) ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <!-- Informations supplémentaires -->
+                <?php if (isset($auth_info)): ?>
+                    <div class="auth-info">
+                        <?= $auth_info ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Retour à l'accueil -->
+            <div class="auth-return">
+                <a href="/" class="btn btn-outline">
+                    <span class="icon">←</span>
+                    Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Messages flash -->
+    <?php if (isset($messages) && !empty($messages)): ?>
+        <div class="messages-container" id="messages">
+            <?php foreach ($messages as $type => $messageList): ?>
+                <?php foreach ($messageList as $message): ?>
+                    <div class="message message-<?= $type ?>" data-type="<?= $type ?>">
+                        <span class="message-content"><?= htmlspecialchars($message) ?></span>
+                        <button class="message-close" aria-label="Fermer">&times;</button>
+                    </div>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    
+    <!-- JavaScript du thème -->
+    <script src="theme/js/theme.js"></script>
+    
+    <style>
+    /* Styles spécifiques à l'authentification */
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-4);
+        gap: var(--spacing-6);
+    }
+    
+    .auth-wrapper {
+        max-width: 420px;
+        width: 100%;
+        padding: var(--spacing-8);
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: var(--spacing-8);
+    }
+    
+    .auth-title {
+        font-size: var(--font-size-3xl);
+        font-weight: var(--font-weight-light);
+        color: var(--color-white);
+        margin-bottom: var(--spacing-2);
+    }
+    
+    .auth-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: var(--font-size-base);
+        margin: 0;
+    }
+    
+    .auth-form {
+        margin-bottom: var(--spacing-6);
+    }
+    
+    .auth-links {
+        text-align: center;
+        padding-top: var(--spacing-6);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .auth-link {
+        color: var(--color-white);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        opacity: 0.8;
+        transition: var(--transition-normal);
+        display: block;
+        padding: var(--spacing-2);
+    }
+    
+    .auth-link:hover {
+        opacity: 1;
+        color: var(--color-sky-blue-light);
+    }
+    
+    .auth-info {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-4);
+        margin-top: var(--spacing-4);
+        font-size: var(--font-size-sm);
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+    }
+    
+    .auth-return {
+        margin-top: auto;
+    }
+    
+    .auth-return .btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: var(--color-white);
+        font-size: var(--font-size-sm);
+    }
+    
+    .auth-return .btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+        .auth-wrapper {
+            padding: var(--spacing-6);
+            margin: var(--spacing-4);
+        }
+        
+        .auth-title {
+            font-size: var(--font-size-2xl);
+        }
+    }
+    </style>
+</body>
+</html>

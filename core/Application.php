@@ -11,12 +11,14 @@ class Application
     private $database;
     private $auth;
     private $config;
+    private $theme;
 
     public function __construct()
     {
         $this->config = new Config();
         $this->database = new Database($this->config);
         $this->auth = new Auth($this->database);
+        $this->theme = new Theme();
         $this->router = new Router($this->auth);
     }
 
@@ -34,7 +36,7 @@ class Application
             // Traitement de la requête
             $this->router->dispatch();
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->handleError($e);
         }
     }
@@ -58,6 +60,11 @@ class Application
     public function getConfig()
     {
         return $this->config;
+    }
+
+    public function getTheme()
+    {
+        return $this->theme;
     }
 }
 ?>
