@@ -2,47 +2,152 @@
 namespace Core;
 
 /**
- * Classe de base pour toutes les vues
- * Fournit les fonctionnalités communes
+ * Gestionnaire de vue
+ * Gère le rendu des templates avec chemins absolus
  */
-abstract class View
+class View
 {
-    protected $database;
-    protected $auth;
-    protected $config;
     protected $theme;
-
+    protected $data = [];
+    
     public function __construct()
     {
-        global $app;
-        $this->database = $app->getDatabase();
-        $this->auth = $app->getAuth();
-        $this->config = $app->getConfig();
-        $this->theme = $app->getTheme();
+        $config = new Config();
+        $this->theme = new Theme();
     }
-
-    protected function render($template, $data = [])
+    
+    /**
+     * Rend une vue avec des données
+     */
+    public function render($template, $data = [])
     {
-        extract($data);
+        $this->data = array_merge($this->data, $data);
         
+        // Détermination du chemin du template avec constantes absolues
+        $templatePath = $this->resolveTemplatePath($template);
+        
+        if (!file_exists($templatePath)) {
+            throw new \Exception("Template non trouvé: $template (chemin: $templatePath)");
+        }
+        
+        // Extraction des variables pour le template
+        extract($this->data);
+        $theme = $this->theme;
+        
+        // Rendu du template
         ob_start();
-        include $template;
-        $content = ob_get_clean();
+        try {
+            include $templatePath;
+        } catch (\Exception $e) {
+            ob_end_clean();
+            throw $e;
+        }
+        echo ob_get_clean();
+    }
+    
+    /**
+     * Résout le chemin d'un template avec constantes absolues
+     */
+    private function resolveTemplatePath($template)
+    {
+        // Chemins possibles avec constantes absolues
+        $possiblePaths = [
+            THEME_PATH . '/templates/' . $template . '.html',
+            THEME_PATH . '/templates/' . $template . '.php', 
+            VIEWS_PATH . '/' . $template . '.php',
+            VIEWS_PATH . '/' . $template . '.html'
+        ];
         
-        echo $content;
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        
+        // Retourne le premier chemin par défaut pour les messages d'erreur
+        return $possiblePaths[0];
     }
-
-    protected function redirect($url)
+    
+    /**
+     * Charge une feuille de style CSS avec chemin absolu
+     */
+    public function loadCSS($style)
     {
-        header("Location: $url");
-        exit;
+        $cssPath = THEME_PATH . '/css/' . $style . '.css';
+        
+        if (file_exists($cssPath)) {
+            return $cssPath;
+        }
+        
+        return null;
     }
-
-    protected function json($data)
+    
+    /**
+     * Charge un script JavaScript avec chemin absolu
+     */
+    public function loadJS($script)
     {
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit;
+        $jsPath = THEME_PATH . '/js/' . $script . '.js';
+        
+        if (file_exists($jsPath)) {
+            return $jsPath;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Inclut un partial avec chemin absolu
+     */
+    public function includePartial($partial, $data = [])
+    {
+        $partialPath = THEME_PATH . '/templates/partials/' . $partial . '.html';
+        
+        if (!file_exists($partialPath)) {
+            $partialPath = VIEWS_PATH . '/partials/' . $partial . '.php';
+        }
+        
+        if (file_exists($partialPath)) {
+            $oldData = $this->data;
+            $this->data = array_merge($this->data, $data);
+            
+            extract($this->data);
+            include $partialPath;
+            
+            $this->data = $oldData;
+        }
+    }
+    
+    /**
+     * Définit des données pour la vue
+     */
+    public function setData($key, $value = null)
+    {
+        if (is_array($key)) {
+            $this->data = array_merge($this->data, $key);
+        } else {
+            $this->data[$key] = $value;
+        }
+    }
+    
+    /**
+     * Obtient les données de la vue
+     */
+    public function getData($key = null)
+    {
+        if ($key === null) {
+            return $this->data;
+        }
+        
+        return $this->data[$key] ?? null;
+    }
+    
+    /**
+     * Échappe les données pour l'affichage HTML
+     */
+    public function escape($data)
+    {
+        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     }
 }
 ?>
