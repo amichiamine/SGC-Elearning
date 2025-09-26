@@ -3,7 +3,7 @@ namespace Core;
 
 /**
  * Système de routage modulaire
- * Gère les routes vers les vues indépendantes
+ * Gère les routes vers les vues indépendantes avec chemins absolus
  */
 class Router
 {
@@ -71,6 +71,24 @@ class Router
         $viewName = end($viewParts);
         $viewClass = "Views\\{$route['view']}\\{$viewName}Controller";
         $method = $route['method'];
+        
+        // Tentative de chargement du fichier contrôleur avec chemins absolus
+        $possiblePaths = [
+            VIEWS_PATH . '/' . str_replace('\\', '/', $route['view']) . '/' . $viewName . 'Controller.php',
+            VIEWS_PATH . '/' . $viewName . '/' . $viewName . 'Controller.php'
+        ];
+        
+        $controllerFile = null;
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                $controllerFile = $path;
+                break;
+            }
+        }
+        
+        if ($controllerFile) {
+            require_once $controllerFile;
+        }
 
         if (class_exists($viewClass)) {
             global $app;
@@ -87,13 +105,29 @@ class Router
     private function handleNotFound()
     {
         http_response_code(404);
-        echo "Page non trouvée";
+        
+        // Tentative de charger une page d'erreur 404 personnalisée
+        $errorPage = VIEWS_PATH . '/errors/404.php';
+        if (file_exists($errorPage)) {
+            include $errorPage;
+        } else {
+            echo "<h1>404 - Page non trouvée</h1>";
+            echo "<p>La page demandée n'existe pas.</p>";
+        }
     }
 
     private function handleUnauthorized()
     {
         http_response_code(403);
-        echo "Accès non autorisé";
+        
+        // Tentative de charger une page d'erreur 403 personnalisée
+        $errorPage = VIEWS_PATH . '/errors/403.php';
+        if (file_exists($errorPage)) {
+            include $errorPage;
+        } else {
+            echo "<h1>403 - Accès non autorisé</h1>";
+            echo "<p>Vous n'avez pas l'autorisation d'accéder à cette page.</p>";
+        }
     }
 
     private function redirect($route)
