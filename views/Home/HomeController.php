@@ -49,7 +49,7 @@ class HomeController extends View
         // Rendu du contenu home
         ob_start();
         extract($data);
-        include 'views/Home/home.html';
+        include VIEWS_PATH . '/Home/home.html';
         $content = ob_get_clean();
         
         // Ajout du contenu au data pour le template de base
@@ -111,7 +111,7 @@ class HomeController extends View
         return [
             [
                 'id' => 1,
-                'title' => 'Management d\'équipe agile',
+                'title' => 'Management d\'\u00e9quipe agile',
                 'description' => 'Apprenez les méthodes modernes de management pour diriger efficacement vos équipes.',
                 'instructor_name' => 'Marie Dubois',
                 'duration' => '8h',
@@ -200,8 +200,8 @@ class HomeController extends View
                 'id' => 1,
                 'name' => 'Marie Dubois',
                 'title' => 'Expert en Management',
-                'bio' => '15 ans d\'expérience en management d\'équipes internationales.',
-                'specialties' => ['Management', 'Leadership', 'Gestion d\'équipe'],
+                'bio' => '15 ans d\'expérience en management d\'\u00e9quipes internationales.',
+                'specialties' => ['Management', 'Leadership', 'Gestion d\'\u00e9quipe'],
                 'courses_count' => 8,
                 'students_count' => 3200,
                 'rating' => 4.9,
@@ -282,7 +282,7 @@ class HomeController extends View
             [
                 'id' => 1,
                 'title' => 'Nouveau : Parcours Certification Management',
-                'content' => 'Découvrez notre nouveau parcours certifiant en management d\'équipe.',
+                'content' => 'Découvrez notre nouveau parcours certifiant en management d\'\u00e9quipe.',
                 'type' => 'new',
                 'url' => '/courses/certification-management',
                 'priority' => 1,
