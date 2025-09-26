@@ -3,7 +3,7 @@ namespace Core;
 
 /**
  * Gestionnaire de configuration
- * Charge les configurations depuis les fichiers JSON
+ * Charge les configurations depuis les fichiers JSON avec chemins absolus
  */
 class Config
 {
@@ -16,19 +16,19 @@ class Config
 
     private function loadConfig()
     {
-        // Configuration de la base de données
+        // Configuration de la base de données avec chemin absolu
         $dbConfig = $this->loadJsonConfig('database.json');
         if ($dbConfig) {
             $this->config['database'] = $dbConfig;
         }
 
-        // Configuration de l'application
+        // Configuration de l'application avec chemin absolu
         $appConfig = $this->loadJsonConfig('app.json');
         if ($appConfig) {
             $this->config['app'] = $appConfig;
         }
 
-        // Configuration des rôles et permissions
+        // Configuration des rôles et permissions avec chemin absolu
         $rolesConfig = $this->loadJsonConfig('roles.json');
         if ($rolesConfig) {
             $this->config['roles'] = $rolesConfig;
@@ -37,11 +37,25 @@ class Config
 
     private function loadJsonConfig($filename)
     {
+        // Utilisation de la constante CONFIG_PATH (chemin absolu)
         $filepath = CONFIG_PATH . '/' . $filename;
         
         if (file_exists($filepath)) {
             $content = file_get_contents($filepath);
-            return json_decode($content, true);
+            
+            if ($content === false) {
+                error_log("Erreur lors de la lecture du fichier de configuration: $filepath");
+                return null;
+            }
+            
+            $decoded = json_decode($content, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log("Erreur JSON dans le fichier $filepath: " . json_last_error_msg());
+                return null;
+            }
+            
+            return $decoded;
         }
         
         return null;
@@ -76,6 +90,49 @@ class Config
         }
 
         $config = $value;
+    }
+    
+    /**
+     * Vérifie si une configuration existe
+     */
+    public function has($key)
+    {
+        $keys = explode('.', $key);
+        $value = $this->config;
+
+        foreach ($keys as $k) {
+            if (!isset($value[$k])) {
+                return false;
+            }
+            $value = $value[$k];
+        }
+
+        return true;
+    }
+    
+    /**
+     * Sauvegarde une configuration dans son fichier
+     */
+    public function save($configName)
+    {
+        if (!isset($this->config[$configName])) {
+            throw new \Exception("Configuration '$configName' non trouvée");
+        }
+        
+        $filepath = CONFIG_PATH . '/' . $configName . '.json';
+        $jsonContent = json_encode($this->config[$configName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        
+        if ($jsonContent === false) {
+            throw new \Exception("Erreur lors de l'encodage JSON pour '$configName'");
+        }
+        
+        $result = file_put_contents($filepath, $jsonContent);
+        
+        if ($result === false) {
+            throw new \Exception("Impossible d'écrire le fichier de configuration: $filepath");
+        }
+        
+        return true;
     }
 }
 ?>
