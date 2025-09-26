@@ -3,7 +3,7 @@ namespace Core;
 
 /**
  * Autoloader PSR-4 pour le chargement automatique des classes
- * Respecte la portabilité avec chemins relatifs uniquement
+ * Respecte la politique "Zero Chemins Absolus" avec constantes
  */
 class Autoloader
 {
@@ -13,7 +13,7 @@ class Autoloader
     {
         spl_autoload_register([$this, 'loadClass']);
         
-        // Enregistrement des namespaces
+        // Enregistrement des namespaces avec constantes absolues
         $this->addNamespace('Core', CORE_PATH);
         $this->addNamespace('Views', VIEWS_PATH);
         $this->addNamespace('Config', CONFIG_PATH);
@@ -47,7 +47,8 @@ class Autoloader
             $prefix = rtrim($prefix, '\\');
         }
         
-        return false;
+        // Fallback pour les classes sans namespace (utilise constantes)
+        return $this->loadLegacyClass($class);
     }
 
     protected function loadMappedFile($prefix, $relativeClass)
@@ -59,6 +60,27 @@ class Autoloader
         foreach ($this->prefixes[$prefix] as $baseDir) {
             $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
             
+            if ($this->requireFile($file)) {
+                return $file;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Chargement des classes legacy sans namespace (avec constantes absolues)
+     */
+    protected function loadLegacyClass($className)
+    {
+        $possiblePaths = [
+            VIEWS_PATH . '/' . $className . '.php',
+            CORE_PATH . '/' . $className . '.php',
+            BASE_PATH . '/controllers/' . $className . '.php',
+            BASE_PATH . '/models/' . $className . '.php'
+        ];
+        
+        foreach ($possiblePaths as $file) {
             if ($this->requireFile($file)) {
                 return $file;
             }
