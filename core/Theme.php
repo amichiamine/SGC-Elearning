@@ -14,7 +14,7 @@ class Theme
 
     public function __construct()
     {
-        $this->themePath = 'theme/';
+        $this->themePath = THEME_PATH . '/';
         $this->loadConfig();
     }
 
@@ -24,13 +24,13 @@ class Theme
     private function loadConfig(): void
     {
         $configFiles = [
-            'theme' => $this->themePath . 'config/theme.json',
-            'colors' => $this->themePath . 'config/colors.json',
-            'typography' => $this->themePath . 'config/typography.json',
-            'spacing' => $this->themePath . 'config/spacing.json',
-            'components' => $this->themePath . 'config/components.json',
-            'layouts' => $this->themePath . 'config/layouts.json',
-            'animations' => $this->themePath . 'config/animations.json'
+            'theme' => THEME_PATH . '/config/theme.json',
+            'colors' => THEME_PATH . '/config/colors.json',
+            'typography' => THEME_PATH . '/config/typography.json',
+            'spacing' => THEME_PATH . '/config/spacing.json',
+            'components' => THEME_PATH . '/config/components.json',
+            'layouts' => THEME_PATH . '/config/layouts.json',
+            'animations' => THEME_PATH . '/config/animations.json'
         ];
 
         $this->config = [];
@@ -87,13 +87,13 @@ class Theme
     public function getCSSAssets(): array
     {
         return [
-            $this->themePath . 'css/variables.css',
-            $this->themePath . 'css/reset.css',
-            $this->themePath . 'css/claymorphism.css',
-            $this->themePath . 'css/components/buttons.css',
-            $this->themePath . 'css/components/forms.css',
-            $this->themePath . 'css/components/cards.css',
-            $this->themePath . 'icons/icons.css'
+            THEME_PATH . '/css/variables.css',
+            THEME_PATH . '/css/reset.css',
+            THEME_PATH . '/css/claymorphism.css',
+            THEME_PATH . '/css/components/buttons.css',
+            THEME_PATH . '/css/components/forms.css',
+            THEME_PATH . '/css/components/cards.css',
+            THEME_PATH . '/icons/icons.css'
         ];
     }
 
@@ -103,7 +103,7 @@ class Theme
     public function getJSAssets(): array
     {
         return [
-            $this->themePath . 'js/theme.js'
+            THEME_PATH . '/js/theme.js'
         ];
     }
 
@@ -148,7 +148,7 @@ class Theme
      */
     public function render(string $template, array $data = []): string
     {
-        $templatePath = $this->themePath . 'templates/' . $template . '.html';
+        $templatePath = THEME_PATH . '/templates/' . $template . '.html';
         
         if (!file_exists($templatePath)) {
             throw new \Exception("Template non trouvé : $templatePath");
@@ -240,7 +240,7 @@ class Theme
      */
     public function asset(string $path): string
     {
-        $fullPath = $this->themePath . $path;
+        $fullPath = THEME_PATH . '/' . $path;
         $timestamp = file_exists($fullPath) ? filemtime($fullPath) : time();
         return $fullPath . '?v=' . $timestamp;
     }
