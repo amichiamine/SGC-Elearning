@@ -1,168 +1,304 @@
 <?php
+
 namespace SGC\Core;
 
 /**
- * Système de routage modulaire pour SGC E-Learning
- * Gère les routes vers les vues indépendantes avec chemins absolus
+ * Routeur pour SGC E-Learning
+ * Gère le routage des requêtes vers les contrôleurs appropriés
  */
 class Router
 {
     private $routes = [];
-    private $auth;
     private $currentRoute = null;
-
-    public function __construct($auth = null)
+    private $middlewares = [];
+    
+    public function __construct()
     {
-        $this->auth = $auth;
-        $this->loadRoutes();
+        $this->registerDefaultRoutes();
+        $this->registerAuthRoutes();
     }
-
-    private function loadRoutes()
+    
+    /**
+     * Enregistre les routes par défaut
+     */
+    private function registerDefaultRoutes()
     {
-        // Routes par défaut du système
-        $this->routes = [
-            '' => ['view' => 'Home', 'method' => 'index', 'auth' => false],
-            'home' => ['view' => 'Home', 'method' => 'index', 'auth' => false],
-            'about' => ['view' => 'Home', 'method' => 'about', 'auth' => false],
-            'contact' => ['view' => 'Home', 'method' => 'contact', 'auth' => false],
-            'login' => ['view' => 'Auth\\Login', 'method' => 'index', 'auth' => false],
-            'register' => ['view' => 'Auth\\Register', 'method' => 'index', 'auth' => false],
-            'logout' => ['view' => 'Auth\\Login', 'method' => 'logout', 'auth' => true],
-            'admin' => ['view' => 'Admin\\Dashboard', 'method' => 'index', 'auth' => true, 'role' => 'admin'],
-            'profile' => ['view' => 'User\\Profile', 'method' => 'index', 'auth' => true],
+        $this->addRoute('GET', '/', 'Home\\HomeController', 'index');
+        $this->addRoute('GET', '/home', 'Home\\HomeController', 'index');
+        $this->addRoute('GET', '/about', 'Home\\HomeController', 'about');
+        $this->addRoute('GET', '/contact', 'Home\\HomeController', 'contact');
+    }
+    
+    /**
+     * Enregistre les routes d'authentification
+     */
+    private function registerAuthRoutes()
+    {
+        // Routes d'authentification
+        $this->addRoute('GET', '/login', 'Auth\\AuthController', 'login');
+        $this->addRoute('POST', '/login', 'Auth\\AuthController', 'login');
+        $this->addRoute('GET', '/register', 'Auth\\AuthController', 'register');
+        $this->addRoute('POST', '/register', 'Auth\\AuthController', 'register');
+        $this->addRoute('GET', '/logout', 'Auth\\AuthController', 'logout');
+        $this->addRoute('POST', '/logout', 'Auth\\AuthController', 'logout');
+        
+        // Routes de profil (nécessitent authentification)
+        $this->addRoute('GET', '/profile', 'Auth\\AuthController', 'profile', ['auth']);
+        $this->addRoute('POST', '/profile', 'Auth\\AuthController', 'profile', ['auth']);
+        
+        // Routes de récupération de mot de passe
+        $this->addRoute('GET', '/forgot-password', 'Auth\\AuthController', 'forgotPassword');
+        $this->addRoute('POST', '/forgot-password', 'Auth\\AuthController', 'forgotPassword');
+        
+        // Routes des tableaux de bord (nécessitent authentification et rôle)
+        $this->addRoute('GET', '/student', 'Student\\StudentController', 'dashboard', ['auth', 'role:student']);
+        $this->addRoute('GET', '/instructor', 'Instructor\\InstructorController', 'dashboard', ['auth', 'role:instructor']);
+        $this->addRoute('GET', '/admin', 'Admin\\AdminController', 'dashboard', ['auth', 'role:admin']);
+    }
+    
+    /**
+     * Ajoute une route
+     */
+    public function addRoute($method, $path, $controller, $action, $middlewares = [])
+    {
+        $this->routes[] = [
+            'method' => strtoupper($method),
+            'path' => $path,
+            'controller' => $controller,
+            'action' => $action,
+            'middlewares' => $middlewares
         ];
     }
     
     /**
-     * Ajoute une route dynamiquement
+     * Route une requête
      */
-    public function addRoute($path, $controller, $method = 'index', $auth = false, $role = null)
+    public function route()
     {
-        $this->routes[$path] = [
-            'view' => $controller,
-            'method' => $method,
-            'auth' => $auth,
-            'role' => $role
-        ];
-    }
-
-    public function dispatch()
-    {
-        $uri = $this->getCurrentUri();
-        $route = $this->findRoute($uri);
-
-        if (!$route) {
-            $this->handleNotFound();
-            return;
-        }
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $path = $this->getCurrentPath();
         
-        $this->currentRoute = $route;
-
-        // Vérification d'authentification
-        if ($route['auth'] && $this->auth && !$this->auth->isAuthenticated()) {
-            $this->redirect('login');
-            return;
-        }
-
-        // Vérification des rôles
-        if (isset($route['role']) && $this->auth && !$this->auth->hasRole($route['role'])) {
-            $this->handleUnauthorized();
-            return;
-        }
-
-        $this->loadView($route);
-    }
-
-    private function getCurrentUri()
-    {
-        $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        
-        // Suppression des paramètres de requête
-        if (($pos = strpos($uri, '?')) !== false) {
-            $uri = substr($uri, 0, $pos);
-        }
-        
-        // Suppression du chemin de base
-        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $basePath = dirname($scriptName);
-        
-        if ($basePath !== '/' && strpos($uri, $basePath) === 0) {
-            $uri = substr($uri, strlen($basePath));
-        }
-        
-        return trim($uri, '/');
-    }
-
-    private function findRoute($uri)
-    {
-        return $this->routes[$uri] ?? null;
-    }
-
-    private function loadView($route)
-    {
-        $viewParts = explode('\\', $route['view']);
-        $viewName = end($viewParts);
-        $controllerName = $viewName . 'Controller';
-        
-        // Construction du chemin vers le contrôleur
-        $controllerPath = VIEWS_PATH . '/' . str_replace('\\', '/', $route['view']) . '/' . $controllerName . '.php';
-        
-        if (file_exists($controllerPath)) {
-            require_once $controllerPath;
-            
-            $controllerClass = "SGC\\Controllers\\" . str_replace('\\', '\\', $route['view']) . "\\" . $controllerName;
-            
-            if (class_exists($controllerClass)) {
-                $controller = new $controllerClass();
+        foreach ($this->routes as $route) {
+            if ($this->matchRoute($route, $method, $path)) {
+                $this->currentRoute = $route;
                 
-                if (method_exists($controller, $route['method'])) {
-                    $controller->{$route['method']}();
-                    return;
+                // Exécution des middlewares
+                if (!empty($route['middlewares'])) {
+                    if (!$this->executeMiddlewares($route['middlewares'])) {
+                        return; // Middleware a arrêté l'exécution
+                    }
                 }
+                
+                return $this->executeRoute($route);
             }
         }
         
-        // Fallback : chargement direct du template si pas de contrôleur
-        $templatePath = VIEWS_PATH . '/' . str_replace('\\', '/', $route['view']) . '/' . strtolower($viewName) . '.html';
+        // Route non trouvée
+        $this->handle404();
+    }
+    
+    /**
+     * Obtient le chemin actuel
+     */
+    private function getCurrentPath()
+    {
+        $path = $_SERVER['REQUEST_URI'] ?? '/';
         
-        if (file_exists($templatePath)) {
-            include $templatePath;
-        } else {
-            $this->handleNotFound();
+        // Supprime les paramètres de requête
+        if (($pos = strpos($path, '?')) !== false) {
+            $path = substr($path, 0, $pos);
+        }
+        
+        // Supprime le chemin de base si l'application n'est pas à la racine
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $basePath = dirname($scriptName);
+        
+        if ($basePath !== '/' && strpos($path, $basePath) === 0) {
+            $path = substr($path, strlen($basePath));
+        }
+        
+        return $path ?: '/';
+    }
+    
+    /**
+     * Vérifie si une route correspond
+     */
+    private function matchRoute($route, $method, $path)
+    {
+        if ($route['method'] !== $method) {
+            return false;
+        }
+        
+        // Correspondance exacte pour l'instant
+        // TODO: Ajouter support des paramètres dynamiques
+        return $route['path'] === $path;
+    }
+    
+    /**
+     * Exécute les middlewares
+     */
+    private function executeMiddlewares($middlewares)
+    {
+        foreach ($middlewares as $middleware) {
+            if (!$this->executeMiddleware($middleware)) {
+                return false; // Middleware a arrêté l'exécution
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Exécute un middleware individuel
+     */
+    private function executeMiddleware($middleware)
+    {
+        // Middleware d'authentification
+        if ($middleware === 'auth') {
+            $auth = new \SGC\Core\Auth();
+            if (!$auth->isLoggedIn()) {
+                header('Location: ' . WEB_ROOT . '/login');
+                exit;
+            }
+            return true;
+        }
+        
+        // Middleware de vérification de rôle
+        if (strpos($middleware, 'role:') === 0) {
+            $requiredRole = substr($middleware, 5);
+            $auth = new \SGC\Core\Auth();
+            
+            if (!$auth->hasRole($requiredRole)) {
+                // Redirection selon le rôle actuel
+                $user = $auth->getUser();
+                if (!$user) {
+                    header('Location: ' . WEB_ROOT . '/login');
+                } else {
+                    switch ($user['role']) {
+                        case 'admin':
+                            header('Location: ' . WEB_ROOT . '/admin');
+                            break;
+                        case 'instructor':
+                            header('Location: ' . WEB_ROOT . '/instructor');
+                            break;
+                        default:
+                            header('Location: ' . WEB_ROOT . '/student');
+                            break;
+                    }
+                }
+                exit;
+            }
+            return true;
+        }
+        
+        // Middleware guest (non connecté uniquement)
+        if ($middleware === 'guest') {
+            $auth = new \SGC\Core\Auth();
+            if ($auth->isLoggedIn()) {
+                $this->redirectToDashboard($auth->getUser());
+                exit;
+            }
+            return true;
+        }
+        
+        return true; // Middleware inconnu = continue
+    }
+    
+    /**
+     * Redirection vers le tableau de bord approprié
+     */
+    private function redirectToDashboard($user)
+    {
+        switch ($user['role']) {
+            case 'admin':
+                header('Location: ' . WEB_ROOT . '/admin');
+                break;
+            case 'instructor':
+                header('Location: ' . WEB_ROOT . '/instructor');
+                break;
+            default:
+                header('Location: ' . WEB_ROOT . '/student');
+                break;
         }
     }
-
-    private function handleNotFound()
+    
+    /**
+     * Exécute une route
+     */
+    private function executeRoute($route)
+    {
+        $controllerClass = $route['controller'];
+        $action = $route['action'];
+        
+        // Construction du nom de classe complet
+        if (strpos($controllerClass, '\\') === false) {
+            $controllerClass = 'SGC\\Controllers\\' . $controllerClass;
+        } else {
+            $controllerClass = 'SGC\\Controllers\\' . $controllerClass;
+        }
+        
+        try {
+            if (!class_exists($controllerClass)) {
+                throw new \Exception("Contrôleur non trouvé: $controllerClass");
+            }
+            
+            $controller = new $controllerClass();
+            
+            if (!method_exists($controller, $action)) {
+                throw new \Exception("Action non trouvée: $action dans $controllerClass");
+            }
+            
+            return $controller->$action();
+            
+        } catch (\Exception $e) {
+            error_log("Erreur de routage: " . $e->getMessage());
+            $this->handle500($e);
+        }
+    }
+    
+    /**
+     * Gère les erreurs 404
+     */
+    private function handle404()
     {
         http_response_code(404);
         
-        $errorPage = VIEWS_PATH . '/errors/404.php';
-        if (file_exists($errorPage)) {
-            include $errorPage;
+        $errorView = VIEWS_PATH . '/errors/404.php';
+        if (file_exists($errorView)) {
+            include $errorView;
         } else {
             echo "<h1>404 - Page non trouvée</h1>";
             echo "<p>La page demandée n'existe pas.</p>";
+            echo '<p><a href="' . WEB_ROOT . '">Retour à l\'accueil</a></p>';
         }
     }
-
-    private function handleUnauthorized()
+    
+    /**
+     * Gère les erreurs 500
+     */
+    private function handle500(\Exception $e)
     {
-        http_response_code(403);
+        http_response_code(500);
         
-        $errorPage = VIEWS_PATH . '/errors/403.php';
-        if (file_exists($errorPage)) {
-            include $errorPage;
+        $errorView = VIEWS_PATH . '/errors/500.php';
+        if (file_exists($errorView)) {
+            $error = $e;
+            include $errorView;
         } else {
-            echo "<h1>403 - Accès non autorisé</h1>";
-            echo "<p>Vous n'avez pas l'autorisation d'accéder à cette page.</p>";
+            echo "<h1>500 - Erreur du serveur</h1>";
+            echo "<p>Une erreur inattendue s'est produite.</p>";
+            
+            try {
+                $debug = \SGC\Core\Config::getInstance()->get('app', 'debug') ?? false;
+                if ($debug) {
+                    echo "<details><summary>Détails techniques</summary>";
+                    echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
+                    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+                    echo "</details>";
+                }
+            } catch (\Exception $configError) {
+                // Ignore si on ne peut pas charger la config
+            }
         }
-    }
-
-    private function redirect($route)
-    {
-        $url = defined('WEB_ROOT') ? WEB_ROOT . '/' . $route : '/' . $route;
-        header("Location: $url");
-        exit;
     }
     
     /**
@@ -178,8 +314,27 @@ class Router
      */
     public function url($path = '')
     {
-        $baseUrl = defined('WEB_ROOT') ? WEB_ROOT : '';
-        return $baseUrl . '/' . ltrim($path, '/');
+        return WEB_ROOT . '/' . ltrim($path, '/');
+    }
+    
+    /**
+     * Vérifie si une route existe
+     */
+    public function hasRoute($method, $path)
+    {
+        foreach ($this->routes as $route) {
+            if ($route['method'] === strtoupper($method) && $route['path'] === $path) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Obtient toutes les routes
+     */
+    public function getRoutes()
+    {
+        return $this->routes;
     }
 }
-?>
