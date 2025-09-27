@@ -1,9 +1,9 @@
 <?php
-namespace Core;
+namespace SGC\Core;
 
 /**
- * Autoloader PSR-4 pour le chargement automatique des classes
- * Respecte la politique "Zero Chemins Absolus" avec constantes
+ * Autoloader PSR-4 pour SGC E-Learning
+ * Chargement automatique des classes selon les namespaces
  */
 class Autoloader
 {
@@ -13,10 +13,10 @@ class Autoloader
     {
         spl_autoload_register([$this, 'loadClass']);
         
-        // Enregistrement des namespaces avec constantes absolues
-        $this->addNamespace('Core', CORE_PATH);
-        $this->addNamespace('Views', VIEWS_PATH);
-        $this->addNamespace('Config', CONFIG_PATH);
+        // Enregistrement des namespaces SGC avec constantes
+        $this->addNamespace('SGC\\Core', CORE_PATH);
+        $this->addNamespace('SGC\\Controllers', VIEWS_PATH);
+        $this->addNamespace('SGC\\Models', BASE_PATH . '/models');
     }
 
     public function addNamespace($prefix, $baseDir)
@@ -47,7 +47,7 @@ class Autoloader
             $prefix = rtrim($prefix, '\\');
         }
         
-        // Fallback pour les classes sans namespace (utilise constantes)
+        // Fallback pour compatibilité ascendante
         return $this->loadLegacyClass($class);
     }
 
@@ -69,7 +69,7 @@ class Autoloader
     }
     
     /**
-     * Chargement des classes legacy sans namespace (avec constantes absolues)
+     * Chargement des classes legacy (avec constantes)
      */
     protected function loadLegacyClass($className)
     {
