@@ -1,16 +1,17 @@
 <?php
-namespace Core;
+namespace SGC\Core;
 
 /**
- * Système de routage modulaire
+ * Système de routage modulaire pour SGC E-Learning
  * Gère les routes vers les vues indépendantes avec chemins absolus
  */
 class Router
 {
     private $routes = [];
     private $auth;
+    private $currentRoute = null;
 
-    public function __construct($auth)
+    public function __construct($auth = null)
     {
         $this->auth = $auth;
         $this->loadRoutes();
@@ -18,13 +19,30 @@ class Router
 
     private function loadRoutes()
     {
-        // Routes par défaut
+        // Routes par défaut du système
         $this->routes = [
             '' => ['view' => 'Home', 'method' => 'index', 'auth' => false],
             'home' => ['view' => 'Home', 'method' => 'index', 'auth' => false],
+            'about' => ['view' => 'Home', 'method' => 'about', 'auth' => false],
+            'contact' => ['view' => 'Home', 'method' => 'contact', 'auth' => false],
             'login' => ['view' => 'Auth\\Login', 'method' => 'index', 'auth' => false],
+            'register' => ['view' => 'Auth\\Register', 'method' => 'index', 'auth' => false],
             'logout' => ['view' => 'Auth\\Login', 'method' => 'logout', 'auth' => true],
             'admin' => ['view' => 'Admin\\Dashboard', 'method' => 'index', 'auth' => true, 'role' => 'admin'],
+            'profile' => ['view' => 'User\\Profile', 'method' => 'index', 'auth' => true],
+        ];
+    }
+    
+    /**
+     * Ajoute une route dynamiquement
+     */
+    public function addRoute($path, $controller, $method = 'index', $auth = false, $role = null)
+    {
+        $this->routes[$path] = [
+            'view' => $controller,
+            'method' => $method,
+            'auth' => $auth,
+            'role' => $role
         ];
     }
 
@@ -37,15 +55,17 @@ class Router
             $this->handleNotFound();
             return;
         }
+        
+        $this->currentRoute = $route;
 
         // Vérification d'authentification
-        if ($route['auth'] && !$this->auth->isAuthenticated()) {
+        if ($route['auth'] && $this->auth && !$this->auth->isAuthenticated()) {
             $this->redirect('login');
             return;
         }
 
         // Vérification des rôles
-        if (isset($route['role']) && !$this->auth->hasRole($route['role'])) {
+        if (isset($route['role']) && $this->auth && !$this->auth->hasRole($route['role'])) {
             $this->handleUnauthorized();
             return;
         }
@@ -56,7 +76,20 @@ class Router
     private function getCurrentUri()
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        $uri = parse_url($uri, PHP_URL_PATH);
+        
+        // Suppression des paramètres de requête
+        if (($pos = strpos($uri, '?')) !== false) {
+            $uri = substr($uri, 0, $pos);
+        }
+        
+        // Suppression du chemin de base
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $basePath = dirname($scriptName);
+        
+        if ($basePath !== '/' && strpos($uri, $basePath) === 0) {
+            $uri = substr($uri, strlen($basePath));
+        }
+        
         return trim($uri, '/');
     }
 
@@ -69,44 +102,40 @@ class Router
     {
         $viewParts = explode('\\', $route['view']);
         $viewName = end($viewParts);
-        $viewClass = "Views\\{$route['view']}\\{$viewName}Controller";
-        $method = $route['method'];
+        $controllerName = $viewName . 'Controller';
         
-        // Tentative de chargement du fichier contrôleur avec chemins absolus
-        $possiblePaths = [
-            VIEWS_PATH . '/' . str_replace('\\', '/', $route['view']) . '/' . $viewName . 'Controller.php',
-            VIEWS_PATH . '/' . $viewName . '/' . $viewName . 'Controller.php'
-        ];
+        // Construction du chemin vers le contrôleur
+        $controllerPath = VIEWS_PATH . '/' . str_replace('\\', '/', $route['view']) . '/' . $controllerName . '.php';
         
-        $controllerFile = null;
-        foreach ($possiblePaths as $path) {
-            if (file_exists($path)) {
-                $controllerFile = $path;
-                break;
+        if (file_exists($controllerPath)) {
+            require_once $controllerPath;
+            
+            $controllerClass = "SGC\\Controllers\\" . str_replace('\\', '\\', $route['view']) . "\\" . $controllerName;
+            
+            if (class_exists($controllerClass)) {
+                $controller = new $controllerClass();
+                
+                if (method_exists($controller, $route['method'])) {
+                    $controller->{$route['method']}();
+                    return;
+                }
             }
         }
         
-        if ($controllerFile) {
-            require_once $controllerFile;
+        // Fallback : chargement direct du template si pas de contrôleur
+        $templatePath = VIEWS_PATH . '/' . str_replace('\\', '/', $route['view']) . '/' . strtolower($viewName) . '.html';
+        
+        if (file_exists($templatePath)) {
+            include $templatePath;
+        } else {
+            $this->handleNotFound();
         }
-
-        if (class_exists($viewClass)) {
-            global $app;
-            $view = new $viewClass($app->getDatabase());
-            if (method_exists($view, $method)) {
-                $view->$method();
-                return;
-            }
-        }
-
-        $this->handleNotFound();
     }
 
     private function handleNotFound()
     {
         http_response_code(404);
         
-        // Tentative de charger une page d'erreur 404 personnalisée
         $errorPage = VIEWS_PATH . '/errors/404.php';
         if (file_exists($errorPage)) {
             include $errorPage;
@@ -120,7 +149,6 @@ class Router
     {
         http_response_code(403);
         
-        // Tentative de charger une page d'erreur 403 personnalisée
         $errorPage = VIEWS_PATH . '/errors/403.php';
         if (file_exists($errorPage)) {
             include $errorPage;
@@ -132,8 +160,26 @@ class Router
 
     private function redirect($route)
     {
-        header("Location: /$route");
+        $url = defined('WEB_ROOT') ? WEB_ROOT . '/' . $route : '/' . $route;
+        header("Location: $url");
         exit;
+    }
+    
+    /**
+     * Obtient la route courante
+     */
+    public function getCurrentRoute()
+    {
+        return $this->currentRoute;
+    }
+    
+    /**
+     * Génère une URL
+     */
+    public function url($path = '')
+    {
+        $baseUrl = defined('WEB_ROOT') ? WEB_ROOT : '';
+        return $baseUrl . '/' . ltrim($path, '/');
     }
 }
 ?>
