@@ -1,9 +1,10 @@
 {
     "type": "sqlite",
-    "path": "database/elearning.db",
+    "path": "{DATABASE_PATH}/elearning.db",
     "options": {
         "create_if_not_exists": true,
-        "foreign_keys": true
+        "foreign_keys": true,
+        "journal_mode": "WAL"
     },
     "mysql": {
         "host": "localhost",
@@ -18,5 +19,11 @@
         "username": "",
         "password": "",
         "port": 5432
+    },
+    "backup": {
+        "enabled": true,
+        "frequency": "daily",
+        "retention_days": 30,
+        "path": "{DATABASE_PATH}/backups/"
     }
 }
