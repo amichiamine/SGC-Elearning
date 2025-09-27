@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo htmlspecialchars($title ?? 'Dashboard Admin - SGC E-Learning'); ?></title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="<?php echo THEME_URL; ?>/css/claymorphism.css">
+    <link rel="stylesheet" href="<?php echo THEME_URL; ?>/css/admin.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="<?php echo ASSETS_URL; ?>/images/favicon.png">
+</head>
+<body class="admin-page">
+    <!-- Navigation Admin -->
+    <nav class="admin-nav">
+        <div class="admin-nav-brand">
+            <h2>SGC Admin</h2>
+        </div>
+        <div class="admin-nav-menu">
+            <?php foreach ($nav_items as $item): ?>
+                <a href="<?php echo $item['url']; ?>" class="nav-item active">
+                    <span class="nav-icon"><?php echo $item['icon']; ?></span>
+                    <span class="nav-label"><?php echo $item['label']; ?></span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+        <div class="admin-nav-user">
+            <div class="user-info">
+                <span class="user-name"><?php echo htmlspecialchars($user['first_name'] ?? $user['username']); ?></span>
+                <span class="user-role"><?php echo htmlspecialchars($user['role']); ?></span>
+            </div>
+            <a href="<?php echo WEB_ROOT; ?>/logout" class="logout-btn">
+                <span>🚪</span> Déconnexion
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="admin-main">
+        <div class="admin-header">
+            <h1>Tableau de bord</h1>
+            <div class="admin-breadcrumb">
+                <a href="<?php echo WEB_ROOT; ?>">Accueil</a>
+                <span>></span>
+                <span>Administration</span>
+            </div>
+        </div>
+
+        <!-- Statistiques générales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <h3><?php echo number_format($stats['total_users'] ?? 0); ?></h3>
+                    <p>Utilisateurs</p>
+                    <small class="stat-change positive">+<?php echo $stats['new_users_month'] ?? 0; ?> ce mois</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <h3><?php echo number_format($stats['total_courses'] ?? 0); ?></h3>
+                    <p>Cours</p>
+                    <small class="stat-change positive">Actifs</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🎓</div>
+                <div class="stat-content">
+                    <h3><?php echo number_format($stats['total_enrollments'] ?? 0); ?></h3>
+                    <p>Inscriptions</p>
+                    <small class="stat-change neutral">Total</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                    <h3><?php echo number_format($stats['new_users_week'] ?? 0); ?></h3>
+                    <p>Nouveaux cette semaine</p>
+                    <small class="stat-change positive">En croissance</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu en deux colonnes -->
+        <div class="admin-content">
+            <!-- Colonne gauche -->
+            <div class="content-left">
+                <!-- Utilisateurs récents -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3>👥 Utilisateurs récents</h3>
+                        <a href="<?php echo WEB_ROOT; ?>/admin/users" class="card-link">Voir tous</a>
+                    </div>
+                    <div class="card-content">
+                        <?php if (!empty($recent_users)): ?>
+                            <div class="users-list">
+                                <?php foreach ($recent_users as $recent_user): ?>
+                                    <div class="user-item">
+                                        <div class="user-avatar">
+                                            <?php echo strtoupper(substr($recent_user['username'], 0, 2)); ?>
+                                        </div>
+                                        <div class="user-info">
+                                            <strong><?php echo htmlspecialchars($recent_user['username']); ?></strong>
+                                            <small><?php echo htmlspecialchars($recent_user['email']); ?></small>
+                                            <div class="user-meta">
+                                                <span class="role-badge role-<?php echo $recent_user['role']; ?>">
+                                                    <?php echo htmlspecialchars($recent_user['role']); ?>
+                                                </span>
+                                                <span class="user-date">
+                                                    <?php echo date('d/m/Y', strtotime($recent_user['created_at'])); ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="empty-state">Aucun utilisateur récent</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Activité récente -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3>🔄 Activité récente</h3>
+                        <a href="<?php echo WEB_ROOT; ?>/admin/reports" class="card-link">Rapports</a>
+                    </div>
+                    <div class="card-content">
+                        <?php if (!empty($recent_activity)): ?>
+                            <div class="activity-list">
+                                <?php foreach ($recent_activity as $activity): ?>
+                                    <div class="activity-item">
+                                        <div class="activity-icon">📚</div>
+                                        <div class="activity-content">
+                                            <p>
+                                                <strong><?php echo htmlspecialchars($activity['username']); ?></strong>
+                                                s'est inscrit au cours
+                                                <strong><?php echo htmlspecialchars($activity['course_title']); ?></strong>
+                                            </p>
+                                            <small><?php echo date('d/m/Y H:i', strtotime($activity['enrolled_at'])); ?></small>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="empty-state">Aucune activité récente</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne droite -->
+            <div class="content-right">
+                <!-- Informations système -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3>⚙️ Informations système</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="system-info">
+                            <div class="info-item">
+                                <span class="info-label">Version PHP:</span>
+                                <span class="info-value"><?php echo $system_info['php_version'] ?? 'N/A'; ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Serveur:</span>
+                                <span class="info-value"><?php echo $system_info['server_software'] ?? 'N/A'; ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Version App:</span>
+                                <span class="info-value"><?php echo $system_info['app_version'] ?? '1.0.0'; ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Base de données:</span>
+                                <span class="info-value">
+                                    <?php echo $system_info['database_size'] ? number_format($system_info['database_size'] / 1024, 2) . ' KB' : 'N/A'; ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions rapides -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3>⚡ Actions rapides</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="quick-actions">
+                            <a href="<?php echo WEB_ROOT; ?>/admin/users?action=create" class="quick-action">
+                                <div class="action-icon">➕</div>
+                                <div class="action-text">
+                                    <strong>Nouvel utilisateur</strong>
+                                    <small>Créer un compte</small>
+                                </div>
+                            </a>
+                            
+                            <a href="<?php echo WEB_ROOT; ?>/admin/courses?action=create" class="quick-action">
+                                <div class="action-icon">📖</div>
+                                <div class="action-text">
+                                    <strong>Nouveau cours</strong>
+                                    <small>Ajouter un cours</small>
+                                </div>
+                            </a>
+                            
+                            <a href="<?php echo WEB_ROOT; ?>/admin/settings" class="quick-action">
+                                <div class="action-icon">⚙️</div>
+                                <div class="action-text">
+                                    <strong>Paramètres</strong>
+                                    <small>Configuration</small>
+                                </div>
+                            </a>
+                            
+                            <a href="<?php echo WEB_ROOT; ?>/admin/reports" class="quick-action">
+                                <div class="action-icon">📊</div>
+                                <div class="action-text">
+                                    <strong>Rapports</strong>
+                                    <small>Statistiques</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Répartition des rôles -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h3>📊 Répartition des utilisateurs</h3>
+                    </div>
+                    <div class="card-content">
+                        <?php if (!empty($stats['users_by_role'])): ?>
+                            <div class="role-stats">
+                                <?php foreach ($stats['users_by_role'] as $roleData): ?>
+                                    <div class="role-stat">
+                                        <span class="role-badge role-<?php echo $roleData['role']; ?>">
+                                            <?php echo htmlspecialchars($roleData['role']); ?>
+                                        </span>
+                                        <span class="role-count"><?php echo $roleData['count']; ?></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="empty-state">Aucune donnée disponible</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="<?php echo THEME_URL; ?>/js/admin.js"></script>
+    <script>
+        // Initialisation du dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation des cartes de statistiques
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('animate-in');
+            });
+
+            // Mise à jour automatique des statistiques (optionnel)
+            // setInterval(updateDashboardStats, 60000); // Toutes les minutes
+        });
+
+        // Fonction pour mettre à jour les statistiques
+        function updateDashboardStats() {
+            // À implémenter : appel AJAX pour récupérer les stats actualisées
+            console.log('Mise à jour des statistiques...');
+        }
+    </script>
+</body>
+</html>
