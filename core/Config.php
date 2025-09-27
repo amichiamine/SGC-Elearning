@@ -1,17 +1,30 @@
 <?php
-namespace Core;
+namespace SGC\Core;
 
 /**
- * Gestionnaire de configuration
+ * Gestionnaire de configuration pour SGC E-Learning
  * Charge les configurations depuis les fichiers JSON avec chemins absolus
  */
 class Config
 {
+    private static $instance = null;
     private $config = [];
 
-    public function __construct()
+    private function __construct()
     {
         $this->loadConfig();
+    }
+    
+    /**
+     * Obtient l'instance singleton
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        
+        return self::$instance;
     }
 
     private function loadConfig()
@@ -133,6 +146,15 @@ class Config
         }
         
         return true;
+    }
+    
+    /**
+     * Recharge toutes les configurations
+     */
+    public function reload()
+    {
+        $this->config = [];
+        $this->loadConfig();
     }
 }
 ?>
