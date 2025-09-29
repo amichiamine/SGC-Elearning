@@ -13,6 +13,286 @@
             "controller": "SGC\\Controllers\\Home\\HomeController",
             "action": "index",
             "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/login",
+            "controller": "SGC\\Controllers\\Auth\\Login\\LoginController",
+            "action": "showLoginForm",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "POST",
+            "path": "/login",
+            "controller": "SGC\\Controllers\\Auth\\Login\\LoginController",
+            "action": "login",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "GET",
+            "path": "/register",
+            "controller": "SGC\\Controllers\\Auth\\Register\\RegisterController",
+            "action": "showRegistrationForm",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "POST",
+            "path": "/register",
+            "controller": "SGC\\Controllers\\Auth\\Register\\RegisterController",
+            "action": "register",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "GET",
+            "path": "/logout",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "logout",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/profile",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "profile",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/profile/update",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "updateProfile",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/dashboard",
+            "controller": "SGC\\Controllers\\Student\\DashboardController",
+            "action": "index",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin",
+            "controller": "SGC\\Controllers\\Admin\\Dashboard\\DashboardController",
+            "action": "index",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/users",
+            "controller": "SGC\\Controllers\\Admin\\Users\\UserController",
+            "action": "index",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/users/edit/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Users\\UserController",
+            "action": "edit",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/users/update/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Users\\UserController",
+            "action": "update",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/users/delete/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Users\\UserController",
+            "action": "delete",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/settings",
+            "controller": "SGC\\Controllers\\Admin\\Settings\\SettingsController",
+            "action": "index",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/settings/update",
+            "controller": "SGC\\Controllers\\Admin\\Settings\\SettingsController",
+            "action": "update",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "index",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses/create",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "create",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses/store",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "store",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses/edit/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "edit",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses/update/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "update",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses/delete/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "delete",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/quizzes",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "index",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/quizzes/create",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "create",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/quizzes/store",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "store",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/quizzes/manage/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "manage",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/quizzes/delete/{id}",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "delete",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/quizzes/{id}/questions/add",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "addQuestion",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/quizzes/{quizId}/questions/delete/{questionId}",
+            "controller": "SGC\\Controllers\\Admin\\Quizzes\\QuizController",
+            "action": "deleteQuestion",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/courses",
+            "controller": "SGC\\Controllers\\Courses\\CourseController",
+            "action": "index",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/courses/show/{id}",
+            "controller": "SGC\\Controllers\\Courses\\CourseController",
+            "action": "show",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/courses/{id}/enroll",
+            "controller": "SGC\\Controllers\\Courses\\EnrollmentController",
+            "action": "enroll",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/lessons/{id}/complete",
+            "controller": "SGC\\Controllers\\Courses\\LessonController",
+            "action": "complete",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/quiz/take/{id}",
+            "controller": "SGC\\Controllers\\Quiz\\QuizController",
+            "action": "take",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/quiz/submit/{id}",
+            "controller": "SGC\\Controllers\\Quiz\\QuizController",
+            "action": "submit",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/quiz/results/{id}",
+            "controller": "SGC\\Controllers\\Quiz\\QuizController",
+            "action": "results",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses/{id}/documents/upload",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "uploadDocument",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses/{courseId}/documents/delete/{documentId}",
+            "controller": "SGC\\Controllers\\Admin\\Courses\\CourseController",
+            "action": "deleteDocument",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/download/document/{id}",
+            "controller": "SGC\\Controllers\\Courses\\DownloadController",
+            "action": "document",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/courses/{id}/chat",
+            "controller": "SGC\\Api\\V1\\ChatController",
+            "action": "getMessages",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/courses/{id}/chat",
+            "controller": "SGC\\Api\\V1\\ChatController",
+            "action": "postMessage",
+            "middlewares": ["auth"]
         }
     ]
 }
