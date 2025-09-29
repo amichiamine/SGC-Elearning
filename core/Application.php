@@ -1,39 +1,35 @@
 <?php
-namespace Core;
+
+namespace SGC\Core;
 
 /**
- * Classe principale de l'application SGC E-Learning
- * Gère l'initialisation et l'exécution sécurisée
+ * Classe principale de l'application SGC E-Learning.
+ * Gère l'initialisation et l'exécution de la requête.
  */
 class Application
 {
-    private $router;
-    private $database;
-    private $auth;
-    private $config;
-    private $theme;
+    private Router $router;
+    private Config $config;
 
-    public function __construct()
+    /**
+     * Le constructeur reçoit les dépendances injectées par le conteneur.
+     */
+    public function __construct(Router $router, Config $config)
     {
-        $this->config = new Config();
-        $this->database = new Database($this->config);
-        $this->auth = new Auth($this->database);
-        $this->theme = new Theme();
-        $this->router = new Router($this->auth);
+        $this->router = $router;
+        $this->config = $config;
     }
 
+    /**
+     * Lance l'application.
+     */
     public function run()
     {
         try {
-            // Initialisation sécurisée de la base de données
-            $this->database->initialize();
+            // Le service Auth, initialisé par le conteneur, gère le démarrage de la session.
+            // La connexion à la base de données est également gérée par le conteneur.
             
-            // Démarrage de la session
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-            
-            // Traitement de la requête
+            // Le routeur traite la requête et appelle le contrôleur approprié.
             $this->router->dispatch();
             
         } catch (\Exception $e) {
@@ -42,63 +38,27 @@ class Application
     }
 
     /**
-     * Gestion sécurisée des erreurs
+     * Gère les erreurs de manière centralisée.
      */
-    private function handleError($exception)
+    private function handleError(\Exception $exception)
     {
-        // Log sécurisé de l'erreur
         error_log("SGC Application Error: " . $exception->getMessage() . " in " . $exception->getFile() . " on line " . $exception->getLine());
         
         $debug = $this->config->get('app.debug', false);
         
         if ($debug) {
-            // Mode développement : affichage détaillé
+            http_response_code(500);
             echo "<h1>Erreur de l'application</h1>";
             echo "<p><strong>Message:</strong> " . htmlspecialchars($exception->getMessage()) . "</p>";
             echo "<p><strong>Fichier:</strong> " . htmlspecialchars($exception->getFile()) . "</p>";
             echo "<p><strong>Ligne:</strong> " . $exception->getLine() . "</p>";
-            echo "<h2>Stack Trace:</h2>";
+            echo "<h2>Trace:</h2>";
             echo "<pre>" . htmlspecialchars($exception->getTraceAsString()) . "</pre>";
         } else {
-            // Mode production : message générique
             http_response_code(500);
-            
-            $errorViewPath = VIEWS_PATH . '/errors/500.php';
-            if (file_exists($errorViewPath)) {
-                include $errorViewPath;
-            } else {
-                echo "<h1>Erreur du serveur</h1>";
-                echo "<p>Une erreur inattendue s'est produite. Veuillez réessayer plus tard.</p>";
-            }
+            // Dans un cas réel, on utiliserait un template de vue pour la page d'erreur.
+            echo "<h1>Erreur du serveur</h1>";
+            echo "<p>Une erreur inattendue s'est produite. Veuillez réessayer plus tard.</p>";
         }
     }
-
-    /**
-     * Getters sécurisés pour les composants
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    public function getAuth()
-    {
-        return $this->auth;
-    }
-
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    public function getTheme()
-    {
-        return $this->theme;
-    }
-    
-    public function getRouter()
-    {
-        return $this->router;
-    }
 }
-?>

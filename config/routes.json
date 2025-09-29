@@ -1,0 +1,18 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/",
+            "controller": "SGC\\Controllers\\Home\\HomeController",
+            "action": "index",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/home",
+            "controller": "SGC\\Controllers\\Home\\HomeController",
+            "action": "index",
+            "middlewares": []
+        }
+    ]
+}
