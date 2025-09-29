@@ -1,5 +1,5 @@
 <?php
-namespace Core;
+namespace SGC\Core;
 
 /**
  * Gestionnaire de vue
@@ -7,15 +7,14 @@ namespace Core;
  */
 class View
 {
-    protected $theme;
-    protected $data = [];
-    
-    public function __construct()
+    protected Theme $theme;
+    protected array $data = [];
+
+    public function __construct(Theme $theme)
     {
-        $config = new Config();
-        $this->theme = new Theme();
+        $this->theme = $theme;
     }
-    
+
     /**
      * Rend une vue avec des données
      */

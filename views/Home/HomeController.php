@@ -1,24 +1,15 @@
 <?php
 
-namespace Views\Home;
+namespace SGC\Controllers\Home;
 
-use Core\View;
-use Core\Database;
+use SGC\Core\Controller;
 
 /**
  * Contrôleur de la vue principale Home
  * Gère l'affichage de la page d'accueil avec thème intégré
  */
-class HomeController extends View
+class HomeController extends Controller
 {
-    protected $database;
-    
-    public function __construct(Database $database)
-    {
-        $this->database = $database;
-        parent::__construct();
-    }
-
     /**
      * Affichage principal de la page d'accueil
      */
@@ -46,18 +37,18 @@ class HomeController extends View
             'statistics' => $this->getStatistics()
         ];
 
-        // Rendu du contenu home
+        // Rendu du contenu home dans une variable
         ob_start();
+        // extract() rend les clés du tableau $data disponibles comme variables
         extract($data);
         include VIEWS_PATH . '/Home/home.html';
         $content = ob_get_clean();
         
         // Ajout du contenu au data pour le template de base
         $data['content'] = $content;
-        $data['theme'] = $this->theme;
         
-        // Rendu avec le template de base qui contient tous les styles
-        $this->render('theme/templates/base.html', $data);
+        // Rendu avec le template de base via le service View
+        $this->view->render('theme/templates/base.html', $data);
     }
 
     /**
@@ -82,8 +73,8 @@ class HomeController extends View
     private function getFeaturedCourses(): array
     {
         try {
-            $pdo = $this->database->getPDO();
-            $stmt = $pdo->query("
+            // Utilisation de $this->db, initialisé dans le contrôleur de base
+            $stmt = $this->db->query("
                 SELECT * FROM courses 
                 WHERE featured = 1 AND status = 'published' 
                 ORDER BY created_at DESC 
@@ -98,7 +89,8 @@ class HomeController extends View
             
             return $courses;
         } catch (\Exception $e) {
-            // En cas d'erreur, retourner des données d'exemple
+            error_log("Erreur de base de données dans HomeController: " . $e->getMessage());
+            // En cas d'erreur, retourner des données d'exemple pour ne pas casser la page
             return $this->getExampleCourses();
         }
     }

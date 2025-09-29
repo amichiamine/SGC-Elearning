@@ -1,0 +1,109 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/",
+            "controller": "SGC\\Controllers\\Home\\HomeController",
+            "action": "index",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/home",
+            "controller": "SGC\\Controllers\\Home\\HomeController",
+            "action": "index",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/about",
+            "controller": "SGC\\Controllers\\Home\\HomeController",
+            "action": "about",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/contact",
+            "controller": "SGC\\Controllers\\Home\\HomeController",
+            "action": "contact",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/login",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "login",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "POST",
+            "path": "/login",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "login",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "GET",
+            "path": "/register",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "register",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "POST",
+            "path": "/register",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "register",
+            "middlewares": ["guest"]
+        },
+        {
+            "method": "GET",
+            "path": "/logout",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "logout",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/logout",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "logout",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/profile",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "profile",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/profile",
+            "controller": "SGC\\Controllers\\Auth\\AuthController",
+            "action": "profile",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/student",
+            "controller": "SGC\\Controllers\\Student\\StudentController",
+            "action": "dashboard",
+            "middlewares": ["auth", "role:student"]
+        },
+        {
+            "method": "GET",
+            "path": "/instructor",
+            "controller": "SGC\\Controllers\\Instructor\\InstructorController",
+            "action": "dashboard",
+            "middlewares": ["auth", "role:instructor"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin",
+            "controller": "SGC\\Controllers\\Admin\\AdminController",
+            "action": "dashboard",
+            "middlewares": ["auth", "role:admin"]
+        }
+    ]
+}

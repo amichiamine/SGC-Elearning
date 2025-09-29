@@ -8,58 +8,41 @@ namespace SGC\Core;
  */
 class Router
 {
-    private $routes = [];
+    private array $routes = [];
     private $currentRoute = null;
-    private $middlewares = [];
-    
-    public function __construct()
+    private Auth $auth;
+    private Config $config;
+    private Container $container;
+
+    public function __construct(Auth $auth, Config $config, Container $container)
     {
-        $this->registerDefaultRoutes();
-        $this->registerAuthRoutes();
+        $this->auth = $auth;
+        $this->config = $config;
+        $this->container = $container;
+        $this->loadRoutesFromConfig();
     }
-    
+
     /**
-     * Enregistre les routes par défaut
+     * Charge les routes depuis le fichier de configuration.
      */
-    private function registerDefaultRoutes()
+    private function loadRoutesFromConfig()
     {
-        $this->addRoute('GET', '/', 'Home\\HomeController', 'index');
-        $this->addRoute('GET', '/home', 'Home\\HomeController', 'index');
-        $this->addRoute('GET', '/about', 'Home\\HomeController', 'about');
-        $this->addRoute('GET', '/contact', 'Home\\HomeController', 'contact');
+        $routes = $this->config->get('routes.routes', []);
+        foreach ($routes as $route) {
+            $this->addRoute(
+                $route['method'],
+                $route['path'],
+                $route['controller'],
+                $route['action'],
+                $route['middlewares'] ?? []
+            );
+        }
     }
-    
+
     /**
-     * Enregistre les routes d'authentification
+     * Ajoute une route à la table de routage.
      */
-    private function registerAuthRoutes()
-    {
-        // Routes d'authentification
-        $this->addRoute('GET', '/login', 'Auth\\AuthController', 'login');
-        $this->addRoute('POST', '/login', 'Auth\\AuthController', 'login');
-        $this->addRoute('GET', '/register', 'Auth\\AuthController', 'register');
-        $this->addRoute('POST', '/register', 'Auth\\AuthController', 'register');
-        $this->addRoute('GET', '/logout', 'Auth\\AuthController', 'logout');
-        $this->addRoute('POST', '/logout', 'Auth\\AuthController', 'logout');
-        
-        // Routes de profil (nécessitent authentification)
-        $this->addRoute('GET', '/profile', 'Auth\\AuthController', 'profile', ['auth']);
-        $this->addRoute('POST', '/profile', 'Auth\\AuthController', 'profile', ['auth']);
-        
-        // Routes de récupération de mot de passe
-        $this->addRoute('GET', '/forgot-password', 'Auth\\AuthController', 'forgotPassword');
-        $this->addRoute('POST', '/forgot-password', 'Auth\\AuthController', 'forgotPassword');
-        
-        // Routes des tableaux de bord (nécessitent authentification et rôle)
-        $this->addRoute('GET', '/student', 'Student\\StudentController', 'dashboard', ['auth', 'role:student']);
-        $this->addRoute('GET', '/instructor', 'Instructor\\InstructorController', 'dashboard', ['auth', 'role:instructor']);
-        $this->addRoute('GET', '/admin', 'Admin\\AdminController', 'dashboard', ['auth', 'role:admin']);
-    }
-    
-    /**
-     * Ajoute une route
-     */
-    public function addRoute($method, $path, $controller, $action, $middlewares = [])
+    public function addRoute(string $method, string $path, string $controller, string $action, array $middlewares = [])
     {
         $this->routes[] = [
             'method' => strtoupper($method),
@@ -69,11 +52,11 @@ class Router
             'middlewares' => $middlewares
         ];
     }
-    
+
     /**
-     * Route une requête
+     * Traite la requête entrante et la dirige vers le bon contrôleur.
      */
-    public function route()
+    public function dispatch()
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $path = $this->getCurrentPath();
@@ -154,22 +137,20 @@ class Router
     {
         // Middleware d'authentification
         if ($middleware === 'auth') {
-            $auth = new \SGC\Core\Auth();
-            if (!$auth->isLoggedIn()) {
+            if (!$this->auth->isLoggedIn()) {
                 header('Location: ' . WEB_ROOT . '/login');
                 exit;
             }
             return true;
         }
-        
+
         // Middleware de vérification de rôle
         if (strpos($middleware, 'role:') === 0) {
             $requiredRole = substr($middleware, 5);
-            $auth = new \SGC\Core\Auth();
-            
-            if (!$auth->hasRole($requiredRole)) {
+
+            if (!$this->auth->hasRole($requiredRole)) {
                 // Redirection selon le rôle actuel
-                $user = $auth->getUser();
+                $user = $this->auth->getUser();
                 if (!$user) {
                     header('Location: ' . WEB_ROOT . '/login');
                 } else {
@@ -189,17 +170,16 @@ class Router
             }
             return true;
         }
-        
+
         // Middleware guest (non connecté uniquement)
         if ($middleware === 'guest') {
-            $auth = new \SGC\Core\Auth();
-            if ($auth->isLoggedIn()) {
-                $this->redirectToDashboard($auth->getUser());
+            if ($this->auth->isLoggedIn()) {
+                $this->redirectToDashboard($this->auth->getUser());
                 exit;
             }
             return true;
         }
-        
+
         return true; // Middleware inconnu = continue
     }
     
@@ -228,27 +208,19 @@ class Router
     {
         $controllerClass = $route['controller'];
         $action = $route['action'];
-        
-        // Construction du nom de classe complet
-        if (strpos($controllerClass, '\\') === false) {
-            $controllerClass = 'SGC\\Controllers\\' . $controllerClass;
-        } else {
-            $controllerClass = 'SGC\\Controllers\\' . $controllerClass;
-        }
-        
+
         try {
-            if (!class_exists($controllerClass)) {
-                throw new \Exception("Contrôleur non trouvé: $controllerClass");
-            }
-            
-            $controller = new $controllerClass();
-            
+            // Utilisation du conteneur pour instancier le contrôleur
+            // Cela injecte automatiquement le conteneur dans le constructeur du contrôleur.
+            $controller = $this->container->make($controllerClass);
+
             if (!method_exists($controller, $action)) {
                 throw new \Exception("Action non trouvée: $action dans $controllerClass");
             }
-            
+
+            // Appel de l'action du contrôleur
             return $controller->$action();
-            
+
         } catch (\Exception $e) {
             error_log("Erreur de routage: " . $e->getMessage());
             $this->handle500($e);

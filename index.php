@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Point d'entrée principal de la plateforme SGC E-Learning
  * Architecture modulaire avec vues indépendantes
@@ -24,7 +25,6 @@ define('DATABASE_PATH', BASE_PATH . '/database');
 function generateSecureBaseUrl() {
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     
-    // Validation et nettoyage de HTTP_HOST
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $host = filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
     
@@ -48,36 +48,43 @@ define('CSS_URL', THEME_URL . '/css');
 define('JS_URL', THEME_URL . '/js');
 define('IMG_URL', ASSETS_URL . '/images');
 
-// Fonctions utilitaires globales
-if (!function_exists('asset')) {
-    function asset($path) {
-        return ASSETS_URL . '/' . ltrim($path, '/');
-    }
-}
-
-if (!function_exists('theme')) {
-    function theme($path) {
-        return THEME_URL . '/' . ltrim($path, '/');
-    }
-}
-
-if (!function_exists('url')) {
-    function url($path = '') {
-        return WEB_ROOT . '/' . ltrim($path, '/');
-    }
-}
-
-// Chargement de l'autoloader
+// Chargement de l'autoloader et du conteneur
 require_once CORE_PATH . '/Autoloader.php';
-$autoloader = new Core\Autoloader();
+require_once CORE_PATH . '/Container.php';
+
+$autoloader = new SGC\Core\Autoloader();
 $autoloader->register();
+
+$container = new SGC\Core\Container();
+
+// Enregistrement des services dans le conteneur
+$container->singleton(SGC\Core\Config::class);
+$container->singleton(SGC\Core\Database::class, function ($c) {
+    return new SGC\Core\Database($c->make(SGC\Core\Config::class));
+});
+$container->singleton(SGC\Core\Auth::class, function ($c) {
+    return new SGC\Core\Auth($c->make(SGC\Core\Database::class));
+});
+$container->singleton(SGC\Core\Theme::class);
+$container->singleton(SGC\Core\Router::class, function ($c) {
+    return new SGC\Core\Router(
+        $c->make(SGC\Core\Auth::class),
+        $c->make(SGC\Core\Config::class),
+        $c
+    );
+});
+$container->singleton(SGC\Core\Application::class, function ($c) {
+    return new SGC\Core\Application(
+        $c->make(SGC\Core\Router::class),
+        $c->make(SGC\Core\Database::class),
+        $c->make(SGC\Core\Config::class)
+    );
+});
 
 // Démarrage sécurisé de l'application
 try {
-    // Initialisation de l'application
-    $app = new Core\Application();
-    
-    // Démarrage de l'application
+    // Résolution et exécution de l'application depuis le conteneur
+    $app = $container->make(SGC\Core\Application::class);
     $app->run();
     
 } catch (Exception $e) {
@@ -89,6 +96,7 @@ try {
     echo "<p>Une erreur inattendue s'est produite. Veuillez contacter l'administrateur.</p>";
     
     // Affichage des détails seulement en mode développement
+    // Note: La config n'est peut-être pas chargée ici, on utilise une constante.
     if (defined('DEBUG_MODE') && DEBUG_MODE) {
         echo "<details><summary>Détails techniques</summary>";
         echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";

@@ -1,0 +1,180 @@
+-- Migration initiale pour la création de toutes les tables de base de SGC E-Learning
+
+-- Table: users
+-- Stocke les informations des utilisateurs et leurs rôles.
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'student',
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    avatar VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'active' CHECK(status IN ('active', 'inactive', 'suspended')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login DATETIME
+);
+
+-- Table: courses
+-- Contient le catalogue des cours.
+CREATE TABLE IF NOT EXISTS courses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    instructor_id INTEGER,
+    category VARCHAR(100),
+    duration VARCHAR(50),
+    level VARCHAR(50) CHECK(level IN ('Débutant', 'Intermédiaire', 'Avancé')),
+    price DECIMAL(10,2) DEFAULT 0,
+    rating DECIMAL(2,1) DEFAULT 0,
+    students_count INTEGER DEFAULT 0,
+    image VARCHAR(500),
+    featured BOOLEAN DEFAULT 0,
+    status VARCHAR(20) DEFAULT 'published' CHECK(status IN ('draft', 'published', 'archived')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (instructor_id) REFERENCES users(id)
+);
+
+-- Table: lessons
+-- Contient les leçons individuelles pour chaque cours.
+CREATE TABLE IF NOT EXISTS lessons (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id INTEGER NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    content TEXT,
+    video_url VARCHAR(500),
+    duration INTEGER DEFAULT 0,
+    order_index INTEGER DEFAULT 1,
+    is_free BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+-- Table: enrollments
+-- Gère les inscriptions des utilisateurs aux cours.
+CREATE TABLE IF NOT EXISTS enrollments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    enrolled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    progress INTEGER DEFAULT 0,
+    completed_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+    UNIQUE(user_id, course_id)
+);
+
+-- Table: instructors
+-- Stocke les informations spécifiques aux formateurs.
+CREATE TABLE IF NOT EXISTS instructors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255),
+    bio TEXT,
+    avatar VARCHAR(500),
+    courses_count INTEGER DEFAULT 0,
+    students_count INTEGER DEFAULT 0,
+    rating DECIMAL(2,1) DEFAULT 0,
+    featured BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Table: testimonials
+-- Contient les témoignages des clients/utilisateurs.
+CREATE TABLE IF NOT EXISTS testimonials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255),
+    content TEXT NOT NULL,
+    avatar VARCHAR(500),
+    rating INTEGER CHECK(rating BETWEEN 1 AND 5),
+    featured BOOLEAN DEFAULT 0,
+    status VARCHAR(20) DEFAULT 'approved' CHECK(status IN ('pending', 'approved', 'rejected')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: announcements
+-- Pour les annonces affichées sur la plateforme.
+CREATE TABLE IF NOT EXISTS announcements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    type VARCHAR(50) CHECK(type IN ('new', 'event', 'promo', 'info')),
+    url VARCHAR(500),
+    priority INTEGER DEFAULT 1,
+    expires_at DATETIME,
+    active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: audit_logs
+-- Pour tracer les actions importantes dans le système.
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    action VARCHAR(100) NOT NULL,
+    module VARCHAR(50) NOT NULL,
+    details TEXT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Table: statistics
+-- Pour stocker des métriques et statistiques diverses.
+CREATE TABLE IF NOT EXISTS statistics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value INTEGER NOT NULL,
+    date DATE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(metric_name, date)
+);
+
+-- Table: settings
+-- Pour les configurations dynamiques de l'application.
+CREATE TABLE IF NOT EXISTS settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key VARCHAR(100) UNIQUE NOT NULL,
+    value TEXT,
+    type VARCHAR(20) DEFAULT 'string',
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: user_tokens
+-- Pour les tokens "Remember Me" de l'authentification.
+CREATE TABLE IF NOT EXISTS user_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Insertion des données initiales (seeds)
+
+-- Création de l'utilisateur admin par défaut
+INSERT INTO users (username, email, password, role, first_name, last_name, status)
+VALUES ('admin', 'admin@sgc-elearning.com', '$2y$10$9vF.3.C.iW/bZkIxvQ.5c.CgB.3yK4Z1b.2wA6.3J4n.9yK5.J6.K', 'admin', 'Admin', 'SGC', 'active'); -- mdp: admin123
+
+-- Paramètres par défaut
+INSERT INTO settings (key, value, type, description) VALUES
+('site_name', 'SGC E-Learning', 'string', 'Nom du site'),
+('site_description', 'Plateforme d''apprentissage en ligne', 'string', 'Description du site'),
+('maintenance_mode', '0', 'boolean', 'Mode maintenance'),
+('allow_registration', '1', 'boolean', 'Autoriser les inscriptions'),
+('max_file_size', '10485760', 'integer', 'Taille max des fichiers (bytes)'),
+('pagination_limit', '20', 'integer', 'Nombre d''items par page'),
+('email_notifications', '1', 'boolean', 'Notifications par email'),
+('theme_color', '#4A90E2', 'string', 'Couleur principale du thème');
