@@ -1,0 +1,84 @@
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">Gérer le Quiz : <?= htmlspecialchars($quiz['title']) ?></h1>
+        <p class="page-subtitle">Ajoutez, modifiez ou supprimez les questions de ce quiz.</p>
+    </div>
+
+    <!-- Section pour ajouter une nouvelle question -->
+    <div class="card clay-card">
+        <div class="card-header">
+            <h3 class="card-title">Ajouter une Nouvelle Question</h3>
+        </div>
+        <div class="card-body">
+            <form action="/admin/quizzes/<?= $quiz['id'] ?>/questions/add" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+
+                <div class="form-group">
+                    <label for="question_text" class="form-label">Texte de la Question</label>
+                    <textarea id="question_text" name="question_text" class="clay-input" rows="3" required></textarea>
+                </div>
+
+                <div class="choices-section">
+                    <label class="form-label">Choix de Réponse</label>
+                    <?php for ($i = 0; $i < 4; $i++): ?>
+                    <div class="choice-input-group">
+                        <input type="radio" name="is_correct" value="<?= $i ?>" class="form-check-input" required>
+                        <input type="text" name="choices[]" class="clay-input" placeholder="Texte de la réponse <?= $i + 1 ?>">
+                    </div>
+                    <?php endfor; ?>
+                    <small>Cochez le bouton radio pour marquer la bonne réponse.</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Ajouter la Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Section pour lister les questions existantes -->
+    <div class="card clay-card mt-4">
+        <div class="card-header">
+            <h3 class="card-title">Questions Actuelles</h3>
+        </div>
+        <div class="card-body">
+            <?php if (empty($questions)): ?>
+                <p class="text-center">Ce quiz ne contient aucune question pour le moment.</p>
+            <?php else: ?>
+                <ul class="question-list">
+                    <?php foreach ($questions as $question): ?>
+                        <li class="question-item">
+                            <div class="question-text">
+                                <strong>Q:</strong> <?= htmlspecialchars($question['question_text']) ?>
+                            </div>
+                            <ul class="choices-list">
+                                <?php foreach ($question['choices'] as $choice): ?>
+                                    <li class="choice-item <?= $choice['is_correct'] ? 'correct' : '' ?>">
+                                        <?= htmlspecialchars($choice['choice_text']) ?>
+                                        <?= $choice['is_correct'] ? '<span class="badge status-published">Correct</span>' : '' ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <div class="question-actions">
+                                <a href="/admin/quizzes/<?= $quiz['id'] ?>/questions/delete/<?= $question['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr ?');">Supprimer</a>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<style>
+.choices-section { margin-top: 1rem; }
+.choice-input-group { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+.choice-input-group .form-check-input { margin-top: 0; }
+.mt-4 { margin-top: 2rem; }
+.question-list { list-style: none; padding: 0; }
+.question-item { border: 1px solid var(--admin-border-color); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; }
+.question-text { font-size: 1.1rem; margin-bottom: 1rem; }
+.choices-list { list-style: none; padding-left: 1rem; }
+.choice-item.correct { font-weight: bold; color: #16a34a; }
+.question-actions { margin-top: 1rem; text-align: right; }
+</style>

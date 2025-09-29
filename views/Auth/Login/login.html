@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $title ?? 'Connexion' ?> - SGC E-Learning</title>
+    <!-- Intégration du thème centralisé -->
+    <link rel="stylesheet" href="<?= theme('css/variables.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/claymorphism.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/components/forms.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/components/buttons.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/layouts/auth.css') ?>">
+</head>
+<body class="clay-container auth-container">
+
+    <div class="auth-card clay-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Connexion</h1>
+            <p class="auth-subtitle">Accédez à votre espace SGC E-Learning</p>
+        </div>
+
+        <!-- Affichage des erreurs (sera rendu dynamique avec un système de messages flash) -->
+        <?php if (!empty($error_message)): ?>
+            <div class="alert alert-danger">
+                <?= htmlspecialchars($error_message) ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="/login" method="POST" class="auth-form">
+            <!-- Champ CSRF pour la sécurité -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+
+            <div class="form-group">
+                <label for="username" class="form-label">Nom d'utilisateur ou Email</label>
+                <input type="text" id="username" name="username" class="clay-input" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" id="password" name="password" class="clay-input" required>
+            </div>
+
+            <div class="form-group-inline">
+                <div class="form-check">
+                    <input type="checkbox" id="remember_me" name="remember_me" class="form-check-input">
+                    <label for="remember_me" class="form-check-label">Se souvenir de moi</label>
+                </div>
+                <a href="/forgot-password" class="form-link">Mot de passe oublié ?</a>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block">
+                    Se connecter
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p>Pas encore de compte ? <a href="/register">Inscrivez-vous ici</a></p>
+            <p><a href="/">Retour à l'accueil</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

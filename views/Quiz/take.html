@@ -1,0 +1,72 @@
+<div class="container">
+    <div class="page-header text-center">
+        <h1 class="page-title">Quiz : <?= htmlspecialchars($quiz['title']) ?></h1>
+        <p class="page-subtitle"><?= htmlspecialchars($quiz['description']) ?></p>
+    </div>
+
+    <form action="/quiz/submit/<?= $quiz['id'] ?>" method="POST" class="quiz-form">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+
+        <?php if (empty($questions)): ?>
+            <p class="text-center">Ce quiz ne contient aucune question pour le moment.</p>
+        <?php else: ?>
+            <?php foreach ($questions as $index => $question): ?>
+                <div class="card clay-card question-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Question <?= $index + 1 ?></h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="question-text"><?= htmlspecialchars($question['question_text']) ?></p>
+                        <div class="choices">
+                            <?php foreach ($question['choices'] as $choice): ?>
+                                <div class="form-check">
+                                    <input type="radio"
+                                           id="choice-<?= $choice['id'] ?>"
+                                           name="questions[<?= $question['id'] ?>]"
+                                           value="<?= $choice['id'] ?>"
+                                           class="form-check-input"
+                                           required>
+                                    <label for="choice-<?= $choice['id'] ?>" class="form-check-label">
+                                        <?= htmlspecialchars($choice['choice_text']) ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="form-actions text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Soumettre mes réponses</button>
+            </div>
+        <?php endif; ?>
+    </form>
+</div>
+
+<style>
+.quiz-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.question-card {
+    margin-bottom: 2rem;
+}
+.question-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+.choices {
+    margin-top: 1rem;
+}
+.form-check {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+.form-check:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.text-center {
+    text-align: center;
+}
+</style>

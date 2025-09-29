@@ -104,17 +104,26 @@ class Router
     }
     
     /**
-     * Vérifie si une route correspond
+     * Vérifie si une route correspond et extrait les paramètres.
      */
     private function matchRoute($route, $method, $path)
     {
         if ($route['method'] !== $method) {
             return false;
         }
-        
-        // Correspondance exacte pour l'instant
-        // TODO: Ajouter support des paramètres dynamiques
-        return $route['path'] === $path;
+
+        // Convertir le chemin de la route en une expression régulière
+        $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[^/]+)', $route['path']);
+        $pattern = '#^' . $pattern . '$#';
+
+        if (preg_match($pattern, $path, $matches)) {
+            // Extraire les paramètres de l'URL
+            $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+            $this->currentRoute['params'] = $params;
+            return true;
+        }
+
+        return false;
     }
     
     /**
@@ -208,18 +217,18 @@ class Router
     {
         $controllerClass = $route['controller'];
         $action = $route['action'];
+        $params = $this->currentRoute['params'] ?? [];
 
         try {
             // Utilisation du conteneur pour instancier le contrôleur
-            // Cela injecte automatiquement le conteneur dans le constructeur du contrôleur.
             $controller = $this->container->make($controllerClass);
 
             if (!method_exists($controller, $action)) {
                 throw new \Exception("Action non trouvée: $action dans $controllerClass");
             }
 
-            // Appel de l'action du contrôleur
-            return $controller->$action();
+            // Appel de l'action du contrôleur avec les paramètres extraits de l'URL
+            return $controller->$action(...array_values($params));
 
         } catch (\Exception $e) {
             error_log("Erreur de routage: " . $e->getMessage());

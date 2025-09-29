@@ -1,0 +1,212 @@
+/*
+ * Styles pour le layout de l'administration
+ */
+
+:root {
+    --admin-bg: #f4f7fc;
+    --sidebar-bg: white;
+    --sidebar-width: 260px;
+    --header-height: 80px;
+    --admin-text-primary: #334155;
+    --admin-text-secondary: #64748b;
+    --admin-border-color: #e2e8f0;
+}
+
+.admin-body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text-primary);
+}
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.admin-sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--admin-border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    border-radius: 0; /* La sidebar n'est pas une carte flottante */
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--admin-border-color);
+    text-align: center;
+}
+
+.sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 1rem 0;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-item .nav-link .icon {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.nav-item .nav-link:hover {
+    background-color: var(--admin-bg);
+    color: var(--color-primary);
+}
+
+.nav-item .nav-link.active {
+    background-color: var(--admin-bg);
+    color: var(--color-primary);
+    border-left-color: var(--color-primary);
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--admin-border-color);
+    display: flex;
+    gap: 1rem;
+}
+
+/* --- Main Content Area --- */
+.admin-main {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-header {
+    height: var(--header-height);
+    background-color: white;
+    border-bottom: 1px solid var(--admin-border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    border-radius: 0;
+}
+
+.header-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.user-greeting {
+    font-weight: 500;
+}
+
+.admin-content {
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+.admin-footer {
+    padding: 1rem 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--admin-text-secondary);
+}
+
+/* --- Dashboard Specific Styles --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.stat-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.5rem;
+    color: white;
+}
+.icon-users { background-color: #3b82f6; }
+.icon-courses { background-color: #16a34a; }
+.icon-enrollments { background-color: #f97316; }
+.icon-new-users { background-color: #8b5cf6; }
+
+.stat-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--admin-text-secondary);
+    margin: 0 0 0.25rem 0;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--admin-text-primary);
+}
+
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.widget-card {
+    padding: 1.5rem;
+}
+.widget-card h3 {
+    margin-top: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+    }
+    .admin-main {
+        margin-left: 0;
+    }
+    /* TODO: Add a toggle button to show/hide sidebar on mobile */
+}

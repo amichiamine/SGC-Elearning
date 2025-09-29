@@ -1,0 +1,70 @@
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">Gestion des Utilisateurs</h1>
+        <p class="page-subtitle">Liste de tous les utilisateurs inscrits sur la plateforme.</p>
+    </div>
+
+    <div class="card clay-card">
+        <div class="card-header">
+            <h3 class="card-title">Utilisateurs</h3>
+            <!-- TODO: Ajouter un bouton "Créer un utilisateur" -->
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom d'utilisateur</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Inscrit le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($users)): ?>
+                            <tr>
+                                <td colspan="7" class="text-center">Aucun utilisateur trouvé.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($users as $user): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($user['id']) ?></td>
+                                    <td><?= htmlspecialchars($user['username']) ?></td>
+                                    <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td><span class="badge role-<?= htmlspecialchars($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span></td>
+                                    <td><span class="badge status-<?= htmlspecialchars($user['status']) ?>"><?= htmlspecialchars($user['status']) ?></span></td>
+                                    <td><?= date('d/m/Y H:i', strtotime($user['created_at'])) ?></td>
+                                    <td>
+                                        <a href="/admin/users/edit/<?= $user['id'] ?>" class="btn btn-sm btn-primary">Modifier</a>
+                                        <!-- La suppression devrait utiliser une méthode POST avec CSRF pour la sécurité -->
+                                        <a href="/admin/users/delete/<?= $user['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quelques styles basiques pour les badges (à déplacer dans un fichier CSS de composants) -->
+<style>
+.badge {
+    padding: 0.25em 0.6em;
+    font-size: 0.8em;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    color: white;
+}
+.role-admin { background-color: #ef4444; }
+.role-instructor { background-color: #f97316; }
+.role-student { background-color: #3b82f6; }
+.status-active { background-color: #16a34a; }
+.status-inactive { background-color: #64748b; }
+.status-suspended { background-color: #f59e0b; }
+</style>

@@ -1,0 +1,81 @@
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">Modifier l'Utilisateur</h1>
+        <p class="page-subtitle">Édition des informations pour : <?= htmlspecialchars($user['username']) ?></p>
+    </div>
+
+    <div class="card clay-card">
+        <div class="card-header">
+            <h3 class="card-title">Informations de l'Utilisateur</h3>
+        </div>
+        <div class="card-body">
+            <form action="/admin/users/update/<?= $user['id'] ?>" method="POST" class="form-grid">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+
+                <div class="form-group">
+                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" class="clay-input" value="<?= htmlspecialchars($user['username']) ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="clay-input" value="<?= htmlspecialchars($user['email']) ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="first_name" class="form-label">Prénom</label>
+                    <input type="text" id="first_name" name="first_name" class="clay-input" value="<?= htmlspecialchars($user['first_name']) ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="last_name" class="form-label">Nom</label>
+                    <input type="text" id="last_name" name="last_name" class="clay-input" value="<?= htmlspecialchars($user['last_name']) ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="role" class="form-label">Rôle</label>
+                    <select id="role" name="role" class="clay-input">
+                        <option value="student" <?= $user['role'] === 'student' ? 'selected' : '' ?>>Étudiant</option>
+                        <option value="instructor" <?= $user['role'] === 'instructor' ? 'selected' : '' ?>>Formateur</option>
+                        <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="status" class="form-label">Statut</label>
+                    <select id="status" name="status" class="clay-input">
+                        <option value="active" <?= $user['status'] === 'active' ? 'selected' : '' ?>>Actif</option>
+                        <option value="inactive" <?= $user['status'] === 'inactive' ? 'selected' : '' ?>>Inactif</option>
+                        <option value="suspended" <?= $user['status'] === 'suspended' ? 'selected' : '' ?>>Suspendu</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <hr class="form-divider">
+                    <h3 class="form-section-title">Changer le mot de passe</h3>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Nouveau mot de passe</label>
+                    <input type="password" id="password" name="password" class="clay-input" placeholder="Laisser vide pour ne pas changer">
+                </div>
+
+                <div class="form-actions full-width">
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                    <a href="/admin/users" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+.full-width {
+    grid-column: 1 / -1;
+}
+</style>

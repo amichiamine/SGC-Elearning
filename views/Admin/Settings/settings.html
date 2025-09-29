@@ -1,0 +1,51 @@
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">Paramètres du Site</h1>
+        <p class="page-subtitle">Configuration globale de la plateforme SGC E-Learning.</p>
+    </div>
+
+    <div class="card clay-card">
+        <div class="card-header">
+            <h3 class="card-title">Configuration</h3>
+        </div>
+        <div class="card-body">
+            <form action="/admin/settings/update" method="POST" class="form-grid">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+
+                <?php foreach ($settings as $key => $setting): ?>
+                    <div class="form-group full-width">
+                        <label for="<?= $key ?>" class="form-label"><?= htmlspecialchars($setting['description']) ?></label>
+
+                        <?php if ($setting['type'] === 'boolean'): ?>
+                            <select id="<?= $key ?>" name="<?= $key ?>" class="clay-input">
+                                <option value="1" <?= $setting['value'] == 1 ? 'selected' : '' ?>>Activé</option>
+                                <option value="0" <?= $setting['value'] == 0 ? 'selected' : '' ?>>Désactivé</option>
+                            </select>
+                        <?php elseif ($setting['type'] === 'integer'): ?>
+                            <input type="number" id="<?= $key ?>" name="<?= $key ?>" class="clay-input" value="<?= htmlspecialchars($setting['value']) ?>">
+                        <?php else: // 'string' and default ?>
+                            <input type="text" id="<?= $key ?>" name="<?= $key ?>" class="clay-input" value="<?= htmlspecialchars($setting['value']) ?>">
+                        <?php endif; ?>
+
+                        <small class="form-text">Clé : <code><?= $key ?></code></small>
+                    </div>
+                <?php endforeach; ?>
+
+                <div class="form-actions full-width">
+                    <button type="submit" class="btn btn-primary">Enregistrer les paramètres</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+.full-width {
+    grid-column: 1 / -1;
+}
+</style>

@@ -1,0 +1,84 @@
+<div class="container course-detail-page">
+    <div class="course-header">
+        <div class="course-header-text">
+            <h1 class="course-title"><?= htmlspecialchars($course['title']) ?></h1>
+            <p class="course-subtitle"><?= htmlspecialchars($course['description']) ?></p>
+            <div class="course-meta">
+                <span><strong>Niveau:</strong> <?= htmlspecialchars($course['level']) ?></span>
+                <span><strong>Catégorie:</strong> <?= htmlspecialchars($course['category']) ?></span>
+                <!-- TODO: Ajouter le nom du formateur -->
+            </div>
+        </div>
+        <div class="course-header-action">
+            <div class="course-price"><?= htmlspecialchars($course['price']) ?> €</div>
+            <!-- TODO: La logique d'inscription sera ajoutée ici -->
+            <a href="/courses/<?= $course['id'] ?>/enroll" class="btn btn-primary btn-lg">S'inscrire à ce cours</a>
+        </div>
+    </div>
+
+    <div class="course-body">
+        <div class="course-content">
+            <h2>À propos de ce cours</h2>
+            <p><?= nl2br(htmlspecialchars($course['description'])) ?></p>
+        </div>
+
+        <div class="course-curriculum">
+            <h2>Programme du cours</h2>
+            <ul class="lesson-list">
+                <?php if (empty($lessons)): ?>
+                    <li class="lesson-item">Le programme de ce cours n'est pas encore disponible.</li>
+                <?php else: ?>
+                    <?php foreach ($lessons as $lesson): ?>
+                        <li class="lesson-item">
+                            <span class="lesson-icon icon-lesson"></span>
+                            <span class="lesson-title"><?= htmlspecialchars($lesson['title']) ?></span>
+                            <!-- TODO: Ajouter la durée de la leçon -->
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.course-detail-page {
+    padding: 2rem 0;
+}
+.course-header {
+    background: var(--glass-light);
+    padding: 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.course-header-action {
+    text-align: center;
+}
+.course-price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+.course-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+.course-content, .course-curriculum {
+    background: var(--glass-light);
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+}
+.lesson-list {
+    list-style: none;
+    padding: 0;
+}
+.lesson-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+</style>

@@ -1,0 +1,49 @@
+<div class="container">
+    <div class="page-header text-center">
+        <h1 class="page-title">Nos Cours</h1>
+        <p class="page-subtitle">Explorez notre catalogue complet de formations pour développer vos compétences.</p>
+    </div>
+
+    <div class="courses-grid">
+        <?php if (empty($courses)): ?>
+            <p class="text-center">Aucun cours n'est disponible pour le moment.</p>
+        <?php else: ?>
+            <?php foreach ($courses as $course): ?>
+                <div class="course-card clay-card">
+                    <div class="course-image">
+                        <!-- Utiliser une image par défaut si aucune n'est définie -->
+                        <img src="<?= htmlspecialchars($course['image'] ?? 'assets/images/courses/default.jpg') ?>" alt="<?= htmlspecialchars($course['title']) ?>" loading="lazy">
+                        <div class="course-badge course-level-<?= strtolower($course['level']) ?>">
+                            <?= htmlspecialchars($course['level']) ?>
+                        </div>
+                    </div>
+
+                    <div class="course-content">
+                        <div class="course-category"><?= htmlspecialchars($course['category']) ?></div>
+                        <h3 class="course-title"><?= htmlspecialchars($course['title']) ?></h3>
+                        <p class="course-description"><?= htmlspecialchars(substr($course['description'], 0, 100)) . '...' ?></p>
+
+                        <div class="course-footer">
+                            <div class="course-price"><?= htmlspecialchars($course['price']) ?> €</div>
+                            <a href="/courses/show/<?= $course['id'] ?>" class="btn btn-primary">
+                                Voir le cours
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+<style>
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+.text-center {
+    text-align: center;
+}
+</style>

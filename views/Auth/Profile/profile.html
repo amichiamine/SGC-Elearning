@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $title ?? 'Mon Profil' ?> - SGC E-Learning</title>
+    <!-- Intégration du thème centralisé -->
+    <link rel="stylesheet" href="<?= theme('css/variables.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/claymorphism.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/components/forms.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/components/buttons.css') ?>">
+    <link rel="stylesheet" href="<?= theme('css/layouts/auth.css') ?>">
+</head>
+<body class="clay-container auth-container">
+
+    <div class="auth-card clay-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Mon Profil</h1>
+            <p class="auth-subtitle">Gérez vos informations personnelles</p>
+        </div>
+
+        <!-- Affichage des messages (sera rendu dynamique avec un système de messages flash) -->
+        <?php if (!empty($success_message)): ?>
+            <div class="alert alert-success">
+                <?= htmlspecialchars($success_message) ?>
+            </div>
+        <?php endif; ?>
+        <?php if (!empty($error_message)): ?>
+            <div class="alert alert-danger">
+                <?= htmlspecialchars($error_message) ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="/profile/update" method="POST" class="auth-form">
+            <!-- Champ CSRF pour la sécurité -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
+
+            <div class="form-group">
+                <label for="username" class="form-label">Nom d'utilisateur (non modifiable)</label>
+                <input type="text" id="username" name="username" class="clay-input" value="<?= htmlspecialchars($user['username'] ?? '') ?>" readonly disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="first_name" class="form-label">Prénom</label>
+                <input type="text" id="first_name" name="first_name" class="clay-input" value="<?= htmlspecialchars($user['first_name'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="last_name" class="form-label">Nom</label>
+                <input type="text" id="last_name" name="last_name" class="clay-input" value="<?= htmlspecialchars($user['last_name'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="clay-input" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+            </div>
+
+            <hr class="form-divider">
+
+            <h2 class="form-section-title">Changer le mot de passe</h2>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
+                <input type="password" id="password" name="password" class="clay-input">
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirm" class="form-label">Confirmer le nouveau mot de passe</label>
+                <input type="password" id="password_confirm" name="password_confirm" class="clay-input">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block">
+                    Mettre à jour le profil
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <a href="/dashboard" class="btn btn-secondary">Retour au tableau de bord</a>
+        </div>
+    </div>
+
+</body>
+</html>

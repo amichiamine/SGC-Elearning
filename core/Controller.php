@@ -63,4 +63,15 @@ abstract class Controller
         header('Location: ' . $url);
         exit;
     }
+
+    /**
+     * Helper pour rendre le layout de l'admin de manière centralisée.
+     */
+    protected function renderAdminLayout(string $title, string $content): void
+    {
+        $this->view->render('theme/templates/admin-layout.html', [
+            'title' => $title,
+            'content' => $content
+        ]);
+    }
 }
