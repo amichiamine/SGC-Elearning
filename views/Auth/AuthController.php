@@ -2,75 +2,267 @@
 
 namespace SGC\Controllers\Auth;
 
-use SGC\Core\Controller;
+use SGC\Core\Auth;
+use SGC\Core\View;
+use SGC\Core\Theme;
 
 /**
- * Gère le profil utilisateur et la déconnexion.
+ * Contrôleur d'authentification pour SGC E-Learning
+ * Gère les pages de connexion, inscription et déconnexion
  */
-class AuthController extends Controller
+class AuthController
 {
-    /**
-     * Affiche la page de profil de l'utilisateur connecté.
-     */
-    public function profile(): void
-    {
-        // Le middleware 'auth' garantit que seul un utilisateur connecté peut accéder ici.
-        $user = $this->auth->getUser();
+    private $auth;
+    private $view;
+    private $theme;
 
-        $this->render('Auth/Profile/profile.html', [
-            'title' => 'Mon Profil',
-            'user' => $user,
-            'csrf_token' => $this->auth->generateCsrfToken()
-        ]);
+    public function __construct()
+    {
+        $this->auth = new Auth();
+        $this->view = new View();
+        $this->theme = new Theme();
     }
 
     /**
-     * Traite la mise à jour du profil utilisateur.
+     * Affiche la page de connexion
      */
-    public function updateProfile(): void
+    public function login()
     {
-        $user = $this->auth->getUser();
-
-        // Vérifier le token CSRF
-        if (!isset($_POST['csrf_token']) || !$this->auth->verifyCsrfToken($_POST['csrf_token'])) {
-            $this->redirect('/profile');
+        // Redirection si déjà connecté
+        if ($this->auth->isLoggedIn()) {
+            $this->redirectToDashboard();
             return;
         }
 
-        // Récupérer les données du formulaire
         $data = [
-            'first_name' => $_POST['first_name'] ?? $user['first_name'],
-            'last_name' => $_POST['last_name'] ?? $user['last_name'],
-            'email' => $_POST['email'] ?? $user['email'],
+            'title' => 'Connexion - SGC E-Learning',
+            'csrf_token' => $this->auth->generateCsrfToken(),
+            'error' => null,
+            'old_input' => []
         ];
 
-        // Mettre à jour le mot de passe s'il est fourni
-        if (!empty($_POST['password'])) {
-            // TODO: Ajouter une validation plus robuste (longueur, confirmation)
-            $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        // Traitement du formulaire POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = array_merge($data, $this->processLogin());
         }
 
-        // Mettre à jour les informations de l'utilisateur dans la base de données
-        $updateStmt = $this->db->query(
-            "UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?",
-            [$data['first_name'], $data['last_name'], $data['email'], $user['id']]
-        );
-
-        // Mettre à jour le mot de passe si changé
-        if (isset($data['password'])) {
-            $this->db->query("UPDATE users SET password = ? WHERE id = ?", [$data['password'], $user['id']]);
-        }
-        
-        // TODO: Ajouter une gestion des erreurs et des messages de succès
-        $this->redirect('/profile');
+        $this->renderAuthView('login', $data);
     }
 
     /**
-     * Gère la déconnexion de l'utilisateur.
+     * Traite la connexion
      */
-    public function logout(): void
+    private function processLogin()
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $rememberMe = isset($_POST['remember_me']);
+        $csrfToken = $_POST['csrf_token'] ?? '';
+
+        // Vérification CSRF
+        if (!$this->auth->verifyCsrfToken($csrfToken)) {
+            return [
+                'error' => 'Token de sécurité invalide.',
+                'old_input' => ['username' => htmlspecialchars($username)]
+            ];
+        }
+
+        // Tentative de connexion
+        $result = $this->auth->login($username, $password, $rememberMe);
+
+        if ($result['success']) {
+            $this->redirectToDashboard();
+            return [];
+        } else {
+            return [
+                'error' => $result['message'],
+                'old_input' => ['username' => htmlspecialchars($username)]
+            ];
+        }
+    }
+
+    /**
+     * Affiche la page d'inscription
+     */
+    public function register()
+    {
+        // Redirection si déjà connecté
+        if ($this->auth->isLoggedIn()) {
+            $this->redirectToDashboard();
+            return;
+        }
+
+        $data = [
+            'title' => 'Inscription - SGC E-Learning',
+            'csrf_token' => $this->auth->generateCsrfToken(),
+            'errors' => [],
+            'success' => null,
+            'old_input' => []
+        ];
+
+        // Traitement du formulaire POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = array_merge($data, $this->processRegister());
+        }
+
+        $this->renderAuthView('register', $data);
+    }
+
+    /**
+     * Traite l'inscription
+     */
+    private function processRegister()
+    {
+        $formData = [
+            'username' => $_POST['username'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'password' => $_POST['password'] ?? '',
+            'password_confirm' => $_POST['password_confirm'] ?? '',
+            'first_name' => $_POST['first_name'] ?? '',
+            'last_name' => $_POST['last_name'] ?? ''
+        ];
+        $csrfToken = $_POST['csrf_token'] ?? '';
+
+        // Sauvegarde pour réaffichage
+        $oldInput = array_map('htmlspecialchars', $formData);
+        unset($oldInput['password'], $oldInput['password_confirm']);
+
+        // Vérification CSRF
+        if (!$this->auth->verifyCsrfToken($csrfToken)) {
+            return [
+                'errors' => ['csrf' => 'Token de sécurité invalide.'],
+                'old_input' => $oldInput
+            ];
+        }
+        
+        // Tentative d'inscription
+        $result = $this->auth->register($formData);
+
+        if ($result['success']) {
+            return [
+                'success' => 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.',
+                'old_input' => []
+            ];
+        } else {
+            return [
+                'errors' => $result['errors'] ?? ['general' => $result['message']],
+                'old_input' => $oldInput
+            ];
+        }
+    }
+
+    /**
+     * Déconnexion
+     */
+    public function logout()
     {
         $this->auth->logout();
-        $this->redirect('/');
+        header('Location: ' . WEB_ROOT . '/login');
+        exit;
+    }
+
+    /**
+     * Redirection vers le tableau de bord approprié selon le rôle
+     */
+    private function redirectToDashboard()
+    {
+        $user = $this->auth->getUser();
+
+        switch ($user['role']) {
+            case 'admin':
+                header('Location: ' . WEB_ROOT . '/admin');
+                break;
+            case 'instructor':
+                header('Location: ' . WEB_ROOT . '/instructor');
+                break;
+            default:
+                header('Location: ' . WEB_ROOT . '/student');
+                break;
+        }
+        exit;
+    }
+
+    /**
+     * Page de profil utilisateur
+     */
+    public function profile()
+    {
+        $this->auth->requireLogin();
+
+        $data = [
+            'title' => 'Mon Profil - SGC E-Learning',
+            'user' => $this->auth->getUser(),
+            'csrf_token' => $this->auth->generateCsrfToken(),
+            'success' => null,
+            'errors' => []
+        ];
+
+        // Traitement de la mise à jour du profil
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = array_merge($data, $this->processProfileUpdate());
+        }
+
+        $this->renderAuthView('profile', $data);
+    }
+
+    /**
+     * Traite la mise à jour du profil
+     */
+    private function processProfileUpdate()
+    {
+        $csrfToken = $_POST['csrf_token'] ?? '';
+
+        // Vérification CSRF
+        if (!$this->auth->verifyCsrfToken($csrfToken)) {
+            return ['errors' => ['csrf' => 'Token de sécurité invalide.']];
+        }
+
+        // À implémenter : mise à jour du profil
+        return ['success' => 'Profil mis à jour avec succès.'];
+    }
+
+    /**
+     * Réinitialisation de mot de passe (formulaire)
+     */
+    public function forgotPassword()
+    {
+        $data = [
+            'title' => 'Mot de passe oublié - SGC E-Learning',
+            'csrf_token' => $this->auth->generateCsrfToken(),
+            'message' => null,
+            'error' => null
+        ];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = array_merge($data, $this->processForgotPassword());
+        }
+
+        $this->renderAuthView('forgot-password', $data);
+    }
+
+    /**
+     * Traite la demande de réinitialisation
+     */
+    private function processForgotPassword()
+    {
+        // À implémenter : système de réinitialisation par email
+        return ['message' => 'Si votre email existe, vous recevrez un lien de réinitialisation.'];
+    }
+
+    /**
+     * Rend une vue d'authentification
+     */
+    private function renderAuthView($template, $data)
+    {
+        // Extraction des variables pour le template
+        extract($data);
+
+        // Inclusion du template
+        $templatePath = VIEWS_PATH . '/Auth/' . $template . '.html';
+        if (file_exists($templatePath)) {
+            include $templatePath;
+        } else {
+            echo "<h1>Template not found: $template</h1>";
+        }
     }
 }

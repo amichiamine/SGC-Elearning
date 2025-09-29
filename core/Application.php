@@ -1,5 +1,5 @@
 <?php
-namespace SGC\Core;
+namespace Core;
 
 /**
  * Classe principale de l'application SGC E-Learning
@@ -7,24 +7,31 @@ namespace SGC\Core;
  */
 class Application
 {
-    private Router $router;
-    private Database $database;
-    private Config $config;
+    private $router;
+    private $database;
+    private $auth;
+    private $config;
+    private $theme;
 
-    public function __construct(Router $router, Database $database, Config $config)
+    public function __construct()
     {
-        $this->router = $router;
-        $this->database = $database;
-        $this->config = $config;
+        $this->config = new Config();
+        $this->database = new Database($this->config);
+        $this->auth = new Auth($this->database);
+        $this->theme = new Theme();
+        $this->router = new Router($this->auth);
     }
 
     public function run()
     {
         try {
-            // La base de données est maintenant initialisée lors de sa création via le conteneur.
+            // Initialisation sécurisée de la base de données
+            $this->database->initialize();
             
-            // Démarrage de la session, géré maintenant par la classe Auth.
-            // Le service Auth est démarré par le conteneur, qui initialise la session.
+            // Démarrage de la session
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             
             // Traitement de la requête
             $this->router->dispatch();

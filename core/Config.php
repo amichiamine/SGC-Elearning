@@ -7,22 +7,44 @@ namespace SGC\Core;
  */
 class Config
 {
+    private static $instance = null;
     private $config = [];
 
-    public function __construct()
+    private function __construct()
     {
         $this->loadConfig();
     }
 
+    /**
+     * Obtient l'instance singleton
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     private function loadConfig()
     {
-        $configFiles = ['database', 'app', 'roles', 'routes'];
+        // Configuration de la base de données avec chemin absolu
+        $dbConfig = $this->loadJsonConfig('database.json');
+        if ($dbConfig) {
+            $this->config['database'] = $dbConfig;
+        }
 
-        foreach ($configFiles as $file) {
-            $configData = $this->loadJsonConfig("{$file}.json");
-            if ($configData) {
-                $this->config[$file] = $configData;
-            }
+        // Configuration de l'application avec chemin absolu
+        $appConfig = $this->loadJsonConfig('app.json');
+        if ($appConfig) {
+            $this->config['app'] = $appConfig;
+        }
+
+        // Configuration des rôles et permissions avec chemin absolu
+        $rolesConfig = $this->loadJsonConfig('roles.json');
+        if ($rolesConfig) {
+            $this->config['roles'] = $rolesConfig;
         }
     }
 

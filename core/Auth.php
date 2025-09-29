@@ -11,15 +11,17 @@ use SGC\Core\Config;
  */
 class Auth
 {
-    private Database $db;
+    private $db;
+    private $config;
     private $user = null;
     private $loginAttempts = [];
     private const MAX_LOGIN_ATTEMPTS = 5;
     private const LOCKOUT_TIME = 900; // 15 minutes
     
-    public function __construct(Database $database)
+    public function __construct()
     {
-        $this->db = $database;
+        $this->db = Database::getInstance();
+        $this->config = Config::getInstance();
         $this->initializeSession();
         $this->loadCurrentUser();
     }
@@ -216,8 +218,18 @@ class Auth
         $token = bin2hex(random_bytes(32));
         $hashedToken = hash('sha256', $token);
         
-        // La table user_tokens est maintenant gérée par les migrations.
+        // Sauvegarde en base (créer table si nécessaire)
         try {
+            $this->db->query(
+                "CREATE TABLE IF NOT EXISTS user_tokens (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    token VARCHAR(255) NOT NULL,
+                    expires_at DATETIME NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )"
+            );
+
             $this->db->query(
                 "INSERT OR REPLACE INTO user_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
                 [$userId, $hashedToken, date('Y-m-d H:i:s', strtotime('+30 days'))]
