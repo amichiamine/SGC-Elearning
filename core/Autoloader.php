@@ -15,7 +15,7 @@ class Autoloader
         
         // Enregistrement des namespaces SGC avec constantes
         $this->addNamespace('SGC\\Core', CORE_PATH);
-        $this->addNamespace('SGC\\Controllers', VIEWS_PATH);
+        $this->addNamespace('SGC\\Controllers', BASE_PATH . '/controllers');
         $this->addNamespace('SGC\\Models', BASE_PATH . '/models');
     }
 

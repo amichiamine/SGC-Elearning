@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace SGC\Core;
 
 /**
  * Gestionnaire de thème centralisé SGC E-Learning

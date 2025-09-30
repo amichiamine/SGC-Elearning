@@ -9,9 +9,9 @@ class CourseController extends Controller
 {
     private $courseModel;
 
-    public function __construct(...$args)
+    public function __construct(\SGC\Core\Container $container)
     {
-        parent::__construct(...$args);
+        parent::__construct($container);
         // Protect all course management actions
         $this->auth->requireRole('admin');
         $this->courseModel = new Course($this->db);
@@ -49,7 +49,7 @@ class CourseController extends Controller
                 // CSRF token is invalid, abort
                 // Optionally, add an error message
                 $this->redirect('/admin/courses');
-                return;
+                exit;
             }
 
             $data = [
@@ -97,7 +97,7 @@ class CourseController extends Controller
             if (!$this->auth->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                 // CSRF token is invalid, abort
                 $this->redirect('/admin/courses');
-                return;
+                exit;
             }
 
             $data = [
@@ -124,7 +124,7 @@ class CourseController extends Controller
             if (!$this->auth->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                 // CSRF token is invalid, abort
                 $this->redirect('/admin/courses');
-                return;
+                exit;
             }
              $this->courseModel->delete($id);
         }
