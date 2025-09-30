@@ -56,9 +56,29 @@
         },
         {
             "method": "GET",
+            "path": "/instructor/course/{id}/progress",
+            "controller": "Instructor\\DashboardController",
+            "action": "studentProgress"
+        },
+        {
+            "method": "GET",
             "path": "/admin/dashboard",
             "controller": "Admin\\DashboardController",
             "action": "index"
+        },
+
+        // --- Student Course Viewing ---
+        {
+            "method": "GET",
+            "path": "/student/course/{id}",
+            "controller": "Student\\CourseController",
+            "action": "view"
+        },
+        {
+            "method": "POST",
+            "path": "/student/lesson/complete/{lesson_id}",
+            "controller": "Student\\CourseController",
+            "action": "markAsComplete"
         },
 
         // --- New Course Management Routes ---
@@ -109,6 +129,38 @@
             "path": "/courses/uploadMaterial/{course_id}/{lesson_id}",
             "controller": "Courses\\CourseController",
             "action": "uploadMaterial"
+        },
+
+        // --- New Quiz Management Routes ---
+        {
+            "method": "GET",
+            "path": "/quiz/edit/{id}",
+            "controller": "QuizController",
+            "action": "edit"
+        },
+        {
+            "method": "POST",
+            "path": "/quiz/addQuestion/{id}",
+            "controller": "QuizController",
+            "action": "addQuestion"
+        },
+        {
+            "method": "GET",
+            "path": "/quiz/take/{id}",
+            "controller": "QuizController",
+            "action": "take"
+        },
+        {
+            "method": "POST",
+            "path": "/quiz/submit/{id}",
+            "controller": "QuizController",
+            "action": "submit"
+        },
+        {
+            "method": "GET",
+            "path": "/quiz/results/{id}",
+            "controller": "QuizController",
+            "action": "results"
         }
     ]
 }

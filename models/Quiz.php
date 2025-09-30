@@ -30,6 +30,17 @@ class Quiz extends Model
     }
 
     /**
+     * Finds a quiz by its ID.
+     */
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->db->getPDO()->prepare("SELECT * FROM quizzes WHERE id = ?");
+        $stmt->execute([$id]);
+        $quiz = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $quiz ?: null;
+    }
+
+    /**
      * Adds a question to a quiz.
      */
     public function addQuestion(int $quiz_id, string $question_text, string $type = 'multiple_choice'): int
@@ -76,5 +87,75 @@ class Quiz extends Model
         $stmt = $this->db->getPDO()->prepare($sql);
         $stmt->execute([$question_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ==========================================================================
+    // Quiz Taking (Student Experience)
+    // ==========================================================================
+
+    /**
+     * Starts a new quiz attempt for a user.
+     * Returns the ID of the new attempt.
+     */
+    public function startAttempt(int $quiz_id, int $user_id): int
+    {
+        $sql = "INSERT INTO quiz_attempts (quiz_id, user_id, status) VALUES (?, ?, 'in_progress')";
+        $stmt = $this->db->getPDO()->prepare($sql);
+        $stmt->execute([$quiz_id, $user_id]);
+        return $this->db->getPDO()->lastInsertId();
+    }
+
+    /**
+     * Saves a user's answer for a specific question in an attempt.
+     */
+    public function saveAnswer(int $attempt_id, int $question_id, int $chosen_choice_id): bool
+    {
+        // First, determine if the chosen answer is correct.
+        $choiceStmt = $this->db->getPDO()->prepare("SELECT is_correct FROM question_choices WHERE id = ?");
+        $choiceStmt->execute([$chosen_choice_id]);
+        $is_correct = $choiceStmt->fetchColumn();
+
+        $sql = "INSERT INTO quiz_attempt_answers (attempt_id, question_id, chosen_choice_id, is_correct) VALUES (?, ?, ?, ?)";
+        $stmt = $this->db->getPDO()->prepare($sql);
+        return $stmt->execute([$attempt_id, $question_id, $chosen_choice_id, $is_correct]);
+    }
+
+    /**
+     * Finalizes a quiz attempt, calculates the score, and updates the record.
+     */
+    public function completeAttempt(int $attempt_id): float
+    {
+        // Get all answers for the attempt
+        $answersStmt = $this->db->getPDO()->prepare("SELECT is_correct FROM quiz_attempt_answers WHERE attempt_id = ?");
+        $answersStmt->execute([$attempt_id]);
+        $answers = $answersStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $total_questions = count($answers);
+        $correct_answers = 0;
+        foreach ($answers as $answer) {
+            if ($answer['is_correct']) {
+                $correct_answers++;
+            }
+        }
+
+        $score = ($total_questions > 0) ? ($correct_answers / $total_questions) * 100 : 0;
+
+        // Update the attempt record with the final score and status
+        $sql = "UPDATE quiz_attempts SET end_time = CURRENT_TIMESTAMP, score = ?, status = 'completed' WHERE id = ?";
+        $stmt = $this->db->getPDO()->prepare($sql);
+        $stmt->execute([$score, $attempt_id]);
+
+        return $score;
+    }
+
+    /**
+     * Finds a quiz attempt by its ID.
+     */
+    public function findAttemptById(int $attempt_id): ?array
+    {
+        $stmt = $this->db->getPDO()->prepare("SELECT * FROM quiz_attempts WHERE id = ?");
+        $stmt->execute([$attempt_id]);
+        $attempt = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $attempt ?: null;
     }
 }

@@ -89,4 +89,82 @@ class QuizController extends Controller
         }
         $this->redirect('/quiz/edit/' . $quiz_id);
     }
+
+    // ==========================================================================
+    // Student-Facing Quiz Methods
+    // ==========================================================================
+
+    /**
+     * Display the quiz for a student to take.
+     */
+    public function take($params)
+    {
+        $quiz_id = (int)$params['id'];
+        $quiz = $this->quizModel->findById($quiz_id); // Note: findById doesn't exist yet in Quiz model, assuming it should. Let's add it.
+
+        if (!$quiz) {
+            $this->redirect('/dashboard'); return;
+        }
+
+        // Permission check: ensure user is enrolled in the course.
+        // This logic will need to be fully implemented. For now, we assume access.
+
+        $user = $this->auth->getUser();
+        $attempt_id = $this->quizModel->startAttempt($quiz_id, $user['id']);
+        $questions = $this->quizModel->getQuizQuestions($quiz_id);
+
+        $this->renderView('Quiz/take.html', [
+            'title' => 'Passer le Quiz : ' . htmlspecialchars($quiz['title']),
+            'quiz' => $quiz,
+            'questions' => $questions,
+            'attempt_id' => $attempt_id,
+            'csrf_token' => $this->auth->generateCsrfToken()
+        ]);
+    }
+
+    /**
+     * Process the student's quiz submission.
+     */
+    public function submit($params)
+    {
+        $attempt_id = (int)$params['id'];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!$this->auth->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
+                $this->redirect('/dashboard'); return;
+            }
+
+            $answers = $_POST['answers'] ?? [];
+            foreach ($answers as $question_id => $choice_id) {
+                $this->quizModel->saveAnswer($attempt_id, $question_id, $choice_id);
+            }
+
+            $this->quizModel->completeAttempt($attempt_id);
+
+            $this->redirect('/quiz/results/' . $attempt_id);
+        }
+    }
+
+    /**
+     * Display the results of a quiz attempt.
+     */
+    public function results($params)
+    {
+        $attempt_id = (int)$params['id'];
+        $attempt = $this->quizModel->findAttemptById($attempt_id);
+
+        if (!$attempt) {
+            $this->redirect('/dashboard'); return;
+        }
+
+        // Ensure the user viewing the results is the one who took the quiz.
+        $user = $this->auth->getUser();
+        if ($attempt['user_id'] != $user['id']) {
+            $this->redirect('/dashboard'); return;
+        }
+
+        $this->renderView('Quiz/results.html', [
+            'title' => 'Résultats du Quiz',
+            'attempt' => $attempt
+        ]);
+    }
 }

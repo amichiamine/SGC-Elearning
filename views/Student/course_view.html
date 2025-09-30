@@ -1,0 +1,118 @@
+<section class="page-section">
+    <div class="container">
+        <h1 class="page-title"><?= htmlspecialchars($course['title']); ?></h1>
+        <p><?= htmlspecialchars($course['description'] ?? ''); ?></p>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar-container mb-large">
+            <label>Votre Progression</label>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" style="width: <?= number_format($progress_percentage, 2); ?>%;">
+                    <?= number_format($progress_percentage, 0); ?>%
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Content -->
+        <div class="course-content">
+            <?php foreach ($modules as $module): ?>
+                <div class="module-container clay-card mb-medium">
+                    <h2 class="module-title"><?= htmlspecialchars($module['title']); ?></h2>
+                    <ul class="lesson-list-student">
+                        <?php foreach ($module['lessons'] as $lesson):
+                            $is_completed = in_array($lesson['id'], $completed_lessons);
+                        ?>
+                            <li class="lesson-item-student <?= $is_completed ? 'completed' : ''; ?>">
+                                <div class="lesson-status">
+                                    <span class="status-icon"><?= $is_completed ? '✔' : '○'; ?></span>
+                                </div>
+                                <div class="lesson-details">
+                                    <h3 class="lesson-title"><?= htmlspecialchars($lesson['title']); ?></h3>
+                                    <!-- Materials for this lesson -->
+                                    <?php if (!empty($lesson['materials'])): ?>
+                                        <div class="lesson-materials">
+                                            <strong>Matériel:</strong>
+                                            <?php foreach ($lesson['materials'] as $material): ?>
+                                                <a href="/<?= htmlspecialchars($material['file_path']) ?>" target="_blank"><?= htmlspecialchars($material['title']) ?></a>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="lesson-actions">
+                                    <?php if ($is_completed): ?>
+                                        <span class="btn btn-disabled">Terminé</span>
+                                    <?php else: ?>
+                                        <?php if ($lesson['content_type'] === 'quiz' && !empty($lesson['quiz_id'])): ?>
+                                            <a href="/quiz/take/<?= $lesson['quiz_id'] ?>" class="btn btn-primary">Passer le Quiz</a>
+                                        <?php else: ?>
+                                            <form action="/student/lesson/complete/<?= $lesson['id'] ?>" method="POST" style="display: inline;">
+                                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+                                                <button type="submit" class="btn btn-secondary">Marquer comme terminé</button>
+                                            </form>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<style>
+.progress-bar-container {
+    width: 100%;
+}
+.progress-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 20px;
+    background-color: #4caf50;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    font-size: 12px;
+}
+.lesson-list-student {
+    list-style: none;
+    padding: 0;
+}
+.lesson-item-student {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+.lesson-item-student.completed {
+    background-color: #f0fff0;
+    opacity: 0.7;
+}
+.lesson-status {
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+.lesson-item-student.completed .status-icon {
+    color: green;
+}
+.lesson-details {
+    flex-grow: 1;
+}
+.lesson-title {
+    margin: 0 0 0.5rem 0;
+}
+.lesson-materials a {
+    margin-right: 1rem;
+    font-size: 0.9rem;
+}
+.btn-disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+</style>

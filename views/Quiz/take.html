@@ -1,0 +1,47 @@
+<section class="page-section">
+    <div class="container">
+        <h1 class="page-title"><?= htmlspecialchars($title ?? 'Passer le Quiz'); ?></h1>
+        <p><?= htmlspecialchars($quiz['description'] ?? ''); ?></p>
+
+        <div class="form-container clay-card">
+            <form action="/quiz/submit/<?= htmlspecialchars($attempt_id); ?>" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+
+                <?php foreach ($questions as $index => $question): ?>
+                    <div class="question-block mb-large">
+                        <h3 class="question-text"><?= ($index + 1) . '. ' . htmlspecialchars($question['question_text']); ?></h3>
+
+                        <div class="choices-block">
+                            <?php foreach ($question['choices'] as $choice): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           name="answers[<?= htmlspecialchars($question['id']); ?>]"
+                                           id="choice_<?= htmlspecialchars($choice['id']); ?>"
+                                           value="<?= htmlspecialchars($choice['id']); ?>" required>
+                                    <label class="form-check-label" for="choice_<?= htmlspecialchars($choice['id']); ?>">
+                                        <?= htmlspecialchars($choice['choice_text']); ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+                <div class="form-actions mt-large">
+                    <button type="submit" class="btn btn-primary">Soumettre le Quiz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<style>
+    .question-block {
+        padding: 1.5rem;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+    .form-check {
+        margin-bottom: 0.75rem;
+    }
+</style>

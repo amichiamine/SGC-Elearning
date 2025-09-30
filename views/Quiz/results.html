@@ -1,0 +1,41 @@
+<section class="page-section">
+    <div class="container text-center">
+        <div class="results-container clay-card">
+            <h1 class="page-title"><?= htmlspecialchars($title ?? 'Résultats du Quiz'); ?></h1>
+
+            <div class="score-display">
+                <p>Votre score final est de :</p>
+                <h2 class="score"><?= htmlspecialchars(number_format($attempt['score'], 2)); ?>%</h2>
+            </div>
+
+            <?php if ($attempt['score'] >= 80): ?>
+                <p class="results-message success">Félicitations ! Vous avez brillamment réussi ce quiz.</p>
+            <?php else: ?>
+                <p class="results-message">N'hésitez pas à revoir le cours et à tenter le quiz à nouveau.</p>
+            <?php endif; ?>
+
+            <div class="form-actions mt-large">
+                <a href="/student/dashboard" class="btn btn-primary">Retour au Tableau de Bord</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .results-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .score-display {
+        margin: 2rem 0;
+    }
+    .score {
+        font-size: 3rem;
+        font-weight: bold;
+        color: var(--color-primary);
+    }
+    .results-message.success {
+        color: green;
+    }
+</style>

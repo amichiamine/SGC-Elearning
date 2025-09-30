@@ -100,11 +100,15 @@ class Course extends Model
     // ==========================================================================
 
     /**
-     * Finds all lessons for a given module, ordered by their index.
+     * Finds all lessons for a given module, including associated quiz IDs.
      */
     public function findLessonsForModule(int $module_id): array
     {
-        $stmt = $this->db->getPDO()->prepare("SELECT * FROM lessons WHERE module_id = ? ORDER BY order_index ASC");
+        $sql = "SELECT l.*, q.id as quiz_id FROM lessons l
+                LEFT JOIN quizzes q ON l.id = q.lesson_id
+                WHERE l.module_id = ?
+                ORDER BY l.order_index ASC";
+        $stmt = $this->db->getPDO()->prepare($sql);
         $stmt->execute([$module_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -160,6 +164,95 @@ class Course extends Model
     {
         $stmt = $this->db->getPDO()->prepare("SELECT * FROM course_materials WHERE lesson_id = ? ORDER BY created_at DESC");
         $stmt->execute([$lesson_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Finds a single lesson by its ID.
+     */
+    public function findLessonById(int $id): ?array
+    {
+        $stmt = $this->db->getPDO()->prepare("SELECT * FROM lessons WHERE id = ?");
+        $stmt->execute([$id]);
+        $lesson = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $lesson ?: null;
+    }
+
+    // ==========================================================================
+    // Progress Tracking
+    // ==========================================================================
+
+    /**
+     * Marks a lesson as complete for a specific user.
+     */
+    public function markLessonAsComplete(int $user_id, int $lesson_id): bool
+    {
+        $sql = "INSERT OR IGNORE INTO lesson_completions (user_id, lesson_id) VALUES (?, ?)";
+        $stmt = $this->db->getPDO()->prepare($sql);
+        $success = $stmt->execute([$user_id, $lesson_id]);
+
+        if ($success && $stmt->rowCount() > 0) {
+            $lesson = $this->findLessonById($lesson_id);
+            if ($lesson) {
+                $this->updateCourseProgress($user_id, $lesson['course_id']);
+            }
+        }
+
+        return $success;
+    }
+
+    /**
+     * Calculates and updates the overall progress for a user in a course.
+     */
+    public function updateCourseProgress(int $user_id, int $course_id): void
+    {
+        $totalLessonsStmt = $this->db->getPDO()->prepare("SELECT COUNT(*) FROM lessons WHERE course_id = ?");
+        $totalLessonsStmt->execute([$course_id]);
+        $total_lessons = $totalLessonsStmt->fetchColumn();
+
+        if ($total_lessons == 0) {
+            return;
+        }
+
+        $completedLessonsStmt = $this->db->getPDO()->prepare(
+            "SELECT COUNT(*) FROM lesson_completions lc
+             JOIN lessons l ON lc.lesson_id = l.id
+             WHERE lc.user_id = ? AND l.course_id = ?"
+        );
+        $completedLessonsStmt->execute([$user_id, $course_id]);
+        $completed_lessons = $completedLessonsStmt->fetchColumn();
+
+        $progress_percentage = ($completed_lessons / $total_lessons) * 100;
+
+        $updateSql = "UPDATE enrollments SET progress_percentage = ? WHERE user_id = ? AND course_id = ?";
+        $updateStmt = $this->db->getPDO()->prepare($updateSql);
+        $updateStmt->execute([$progress_percentage, $user_id, $course_id]);
+    }
+
+    /**
+     * Gets a list of completed lesson IDs for a user in a specific course.
+     */
+    public function getCompletedLessons(int $user_id, int $course_id): array
+    {
+        $sql = "SELECT lc.lesson_id FROM lesson_completions lc
+                JOIN lessons l ON lc.lesson_id = l.id
+                WHERE lc.user_id = ? AND l.course_id = ?";
+        $stmt = $this->db->getPDO()->prepare($sql);
+        $stmt->execute([$user_id, $course_id]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
+
+    /**
+     * Gets a list of enrolled students for a course, including their progress.
+     */
+    public function getEnrolledStudentsWithProgress(int $course_id): array
+    {
+        $sql = "SELECT u.id, u.username, u.email, e.enrolled_at, e.progress_percentage
+                FROM users u
+                JOIN enrollments e ON u.id = e.user_id
+                WHERE e.course_id = ?";
+        $stmt = $this->db->getPDO()->prepare($sql);
+        $stmt->execute([$course_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
