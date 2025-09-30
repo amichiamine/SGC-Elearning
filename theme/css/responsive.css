@@ -2,27 +2,90 @@
    Responsive Design
    ========================================================================== */
 
+/* Medium devices and down (tablets and phones, 992px and down) */
+@media only screen and (max-width: 992px) {
+    /* --- Main Navigation --- */
+    .navbar-menu {
+        display: none; /* Hide menu by default */
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 60px; /* Adjust based on nav height */
+        left: 0;
+        background-color: var(--color-surface);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .navbar-menu.is-active {
+        display: flex; /* Show when active */
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .nav-link, .btn {
+        width: 100%;
+        text-align: left;
+        padding: 1rem;
+        border-radius: 0;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .navbar-toggle {
+        display: block; /* Show the hamburger menu icon */
+        cursor: pointer;
+    }
+
+    /* --- General Layout --- */
+    .main-container {
+        padding: var(--spacing-medium);
+    }
+}
+
+
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
-    /* Styles for mobile phones */
-}
+    /* --- Tables --- */
+    .table thead {
+        display: none; /* Hide table headers */
+    }
 
-/* Small devices (portrait tablets and large phones, 600px and up) */
-@media only screen and (min-width: 600px) {
-    /* Styles for tablets in portrait mode */
-}
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
 
-/* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 768px) {
-    /* Styles for tablets in landscape mode */
-}
+    .table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--color-border);
+    }
 
-/* Large devices (laptops/desktops, 992px and up) */
-@media only screen and (min-width: 992px) {
-    /* Styles for laptops and desktops */
-}
+    .table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
 
-/* Extra large devices (large laptops and desktops, 1200px and up) */
-@media only screen and (min-width: 1200px) {
-    /* Styles for large screens */
+    .table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 45%;
+        padding-left: 1rem;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    /* --- Forms --- */
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
 }
