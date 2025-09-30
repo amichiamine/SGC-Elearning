@@ -38,7 +38,7 @@ class AuthController extends Controller
             $data = array_merge($data, $this->processLogin());
         }
 
-        $this->renderAuthView('login', $data);
+        $this->renderView('Auth/login.html', $data, 'theme/templates/auth');
     }
 
     /**
@@ -97,7 +97,7 @@ class AuthController extends Controller
             $data = array_merge($data, $this->processRegister());
         }
 
-        $this->renderAuthView('register', $data);
+        $this->renderView('Auth/register.html', $data, 'theme/templates/auth');
     }
 
     /**
@@ -194,7 +194,7 @@ class AuthController extends Controller
             $data = array_merge($data, $this->processProfileUpdate());
         }
 
-        $this->renderAuthView('profile', $data);
+        $this->renderView('Auth/profile.html', $data, 'theme/templates/auth');
     }
 
     /**
@@ -229,7 +229,7 @@ class AuthController extends Controller
             $data = array_merge($data, $this->processForgotPassword());
         }
 
-        $this->renderAuthView('forgot-password', $data);
+        $this->renderView('Auth/forgot-password.html', $data, 'theme/templates/auth');
     }
 
     /**
@@ -241,20 +241,4 @@ class AuthController extends Controller
         return ['message' => 'Si votre email existe, vous recevrez un lien de réinitialisation.'];
     }
 
-    /**
-     * Rend une vue d'authentification
-     */
-    private function renderAuthView($template, $data)
-    {
-        // Extraction des variables pour le template
-        extract($data);
-
-        // Inclusion du template
-        $templatePath = VIEWS_PATH . '/Auth/' . $template . '.html';
-        if (file_exists($templatePath)) {
-            include $templatePath;
-        } else {
-            echo "<h1>Template not found: $template</h1>";
-        }
-    }
 }

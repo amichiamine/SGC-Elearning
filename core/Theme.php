@@ -99,6 +99,9 @@ class Theme
             THEME_PATH . '/css/components/buttons.css',
             THEME_PATH . '/css/components/forms.css',
             THEME_PATH . '/css/components/cards.css',
+            THEME_PATH . '/css/components/tables.css',
+            THEME_PATH . '/css/components/progress.css',
+            THEME_PATH . '/css/components/quiz.css',
             // THEME_PATH . '/icons/icons.css', // This file does not exist yet
 
             // Base layout styles

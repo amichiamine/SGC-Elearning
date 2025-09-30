@@ -39,7 +39,7 @@
 
                 <div id="choices-container">
                     <label>Choix de réponses</label>
-                    <!-- Choices will be added here dynamically -->
+                    <!-- Choices will be added here dynamically by quiz-editor.js -->
                 </div>
 
                 <button type="button" id="add-choice-btn" class="btn btn-secondary btn-sm mt-small">Ajouter un choix</button>
@@ -51,50 +51,3 @@
         </div>
     </div>
 </section>
-
-<style>
-    .correct-answer {
-        color: green;
-        font-weight: bold;
-    }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const addChoiceBtn = document.getElementById('add-choice-btn');
-    const choicesContainer = document.getElementById('choices-container');
-    let choiceCounter = 0;
-
-    function addChoiceInput() {
-        const choiceWrapper = document.createElement('div');
-        choiceWrapper.className = 'form-group d-flex align-items-center';
-
-        const radioInput = document.createElement('input');
-        radioInput.type = 'radio';
-        radioInput.name = 'is_correct';
-        radioInput.value = choiceCounter;
-        radioInput.className = 'mr-small';
-        if (choiceCounter === 0) {
-            radioInput.checked = true; // Default check the first one
-        }
-
-        const textInput = document.createElement('input');
-        textInput.type = 'text';
-        textInput.name = `choices[${choiceCounter}]`;
-        textInput.className = 'form-control';
-        textInput.placeholder = `Choix ${choiceCounter + 1}`;
-
-        choiceWrapper.appendChild(radioInput);
-        choiceWrapper.appendChild(textInput);
-        choicesContainer.appendChild(choiceWrapper);
-
-        choiceCounter++;
-    }
-
-    addChoiceBtn.addEventListener('click', addChoiceInput);
-
-    // Add a few choices by default
-    addChoiceInput();
-    addChoiceInput();
-});
-</script>

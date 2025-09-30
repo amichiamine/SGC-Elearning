@@ -1,0 +1,22 @@
+/* Styles pour les barres de progression */
+.progress-bar {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    height: 20px;
+    border: 1px solid var(--color-border-light);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--gradient-success);
+    text-align: center;
+    line-height: 20px;
+    color: var(--color-white);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    transition: width 0.5s ease-in-out;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+}

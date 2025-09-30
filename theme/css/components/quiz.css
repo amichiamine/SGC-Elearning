@@ -1,0 +1,80 @@
+/* Styles for Quiz editing */
+
+.correct-answer {
+    color: var(--color-green-light); /* Using a theme variable */
+    font-weight: var(--font-weight-bold);
+}
+
+/* Margin utility classes */
+.mb-large {
+    margin-bottom: var(--spacing-6);
+}
+
+.mb-medium {
+    margin-bottom: var(--spacing-4);
+}
+
+.mt-small {
+    margin-top: var(--spacing-2);
+}
+
+.mt-large {
+    margin-top: var(--spacing-6);
+}
+
+.mr-small {
+    margin-right: var(--spacing-2);
+}
+
+
+/* Flexbox utility classes */
+.d-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+/* Styles for taking a quiz */
+.question-block {
+    padding: var(--spacing-5);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-bottom: var(--spacing-5);
+}
+
+.question-text {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--spacing-4);
+}
+
+.choices-block .form-check {
+    margin-bottom: var(--spacing-3);
+}
+
+/* Styles for quiz results */
+.results-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-8);
+    text-align: center;
+}
+
+.score-display {
+    margin: var(--spacing-6) 0;
+}
+
+.score {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-sky-blue-light);
+    text-shadow: 0 4px 15px rgba(74, 144, 226, 0.5);
+}
+
+.results-message.success {
+    color: var(--color-green-light);
+    font-weight: var(--font-weight-medium);
+}

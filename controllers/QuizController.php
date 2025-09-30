@@ -56,7 +56,9 @@ class QuizController extends Controller
             'title' => 'Modifier le Quiz : ' . htmlspecialchars($quiz['title']),
             'quiz' => $quiz,
             'questions' => $questions,
-            'csrf_token' => $this->auth->generateCsrfToken()
+            'csrf_token' => $this->auth->generateCsrfToken(),
+            'extra_css' => ['theme/css/components/quiz.css'],
+            'extra_js' => ['theme/js/quiz-editor.js']
         ]);
     }
 
@@ -118,7 +120,8 @@ class QuizController extends Controller
             'quiz' => $quiz,
             'questions' => $questions,
             'attempt_id' => $attempt_id,
-            'csrf_token' => $this->auth->generateCsrfToken()
+            'csrf_token' => $this->auth->generateCsrfToken(),
+            'extra_css' => ['theme/css/components/quiz.css']
         ]);
     }
 
@@ -164,7 +167,8 @@ class QuizController extends Controller
 
         $this->renderView('Quiz/results.html', [
             'title' => 'Résultats du Quiz',
-            'attempt' => $attempt
+            'attempt' => $attempt,
+            'extra_css' => ['theme/css/components/quiz.css']
         ]);
     }
 }

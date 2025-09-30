@@ -45,8 +45,8 @@
         {
             "method": "GET",
             "path": "/student/dashboard",
-            "controller": "Student\\DashboardController",
-            "action": "index"
+            "controller": "Student\\StudentController",
+            "action": "dashboard"
         },
         {
             "method": "GET",
@@ -63,8 +63,8 @@
         {
             "method": "GET",
             "path": "/admin/dashboard",
-            "controller": "Admin\\DashboardController",
-            "action": "index"
+            "controller": "Admin\\AdminController",
+            "action": "dashboard"
         },
 
         // --- Student Course Viewing ---
