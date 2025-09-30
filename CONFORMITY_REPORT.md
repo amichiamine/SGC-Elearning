@@ -62,7 +62,7 @@ Cet audit a été mené pour évaluer la conformité du projet SGC E-Learning da
 
 **Verdict : ⭐ Partiellement Conforme**
 -   **Protection XSS :** **Conforme.** L'utilisation de `htmlspecialchars()` est bien appliquée dans les vues existantes.
--   **Protection CSRF :** **Non vérifiable.** Le code pour générer un jeton existe, mais son implémentation n'a pas pu être vérifiée en l'absence de formulaires fonctionnels.
+-   **Protection CSRF :** **Non vérifiable.** Le code pour générer un jeton CSRF existe dans `core/Auth.php`, mais son implémentation n'a pas pu être vérifiée en l'absence de formulaires fonctionnels (connexion, inscription).
 
 ## 3. Conclusion
 
