@@ -14,46 +14,36 @@ class Router
 
     public function __construct()
     {
-        $this->registerDefaultRoutes();
-        $this->registerAuthRoutes();
+        $this->loadRoutes();
     }
 
     /**
-     * Enregistre les routes par défaut
+     * Charge les routes depuis le fichier de configuration
      */
-    private function registerDefaultRoutes()
+    private function loadRoutes()
     {
-        $this->addRoute('GET', '/', 'Home\\HomeController', 'index');
-        $this->addRoute('GET', '/home', 'Home\\HomeController', 'index');
-        $this->addRoute('GET', '/about', 'Home\\HomeController', 'about');
-        $this->addRoute('GET', '/contact', 'Home\\HomeController', 'contact');
-    }
+        $routesFile = CONFIG_PATH . '/routes.json';
+        if (!file_exists($routesFile)) {
+            throw new \Exception("Le fichier de configuration des routes est introuvable.");
+        }
 
-    /**
-     * Enregistre les routes d'authentification
-     */
-    private function registerAuthRoutes()
-    {
-        // Routes d'authentification
-        $this->addRoute('GET', '/login', 'Auth\\AuthController', 'login');
-        $this->addRoute('POST', '/login', 'Auth\\AuthController', 'login');
-        $this->addRoute('GET', '/register', 'Auth\\AuthController', 'register');
-        $this->addRoute('POST', '/register', 'Auth\\AuthController', 'register');
-        $this->addRoute('GET', '/logout', 'Auth\\AuthController', 'logout');
-        $this->addRoute('POST', '/logout', 'Auth\\AuthController', 'logout');
+        $routesConfig = json_decode(file_get_contents($routesFile), true);
 
-        // Routes de profil (nécessitent authentification)
-        $this->addRoute('GET', '/profile', 'Auth\\AuthController', 'profile', ['auth']);
-        $this->addRoute('POST', '/profile', 'Auth\\AuthController', 'profile', ['auth']);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception("Erreur de décodage du fichier routes.json: " . json_last_error_msg());
+        }
 
-        // Routes de récupération de mot de passe
-        $this->addRoute('GET', '/forgot-password', 'Auth\\AuthController', 'forgotPassword');
-        $this->addRoute('POST', '/forgot-password', 'Auth\\AuthController', 'forgotPassword');
-
-        // Routes des tableaux de bord (nécessitent authentification et rôle)
-        $this->addRoute('GET', '/student', 'Student\\StudentController', 'dashboard', ['auth', 'role:student']);
-        $this->addRoute('GET', '/instructor', 'Instructor\\InstructorController', 'dashboard', ['auth', 'role:instructor']);
-        $this->addRoute('GET', '/admin', 'Admin\\AdminController', 'dashboard', ['auth', 'role:admin']);
+        if (isset($routesConfig['routes']) && is_array($routesConfig['routes'])) {
+            foreach ($routesConfig['routes'] as $route) {
+                $this->addRoute(
+                    $route['method'],
+                    $route['path'],
+                    $route['controller'],
+                    $route['action'],
+                    $route['middlewares'] ?? []
+                );
+            }
+        }
     }
 
     /**

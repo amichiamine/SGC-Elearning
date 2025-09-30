@@ -1,0 +1,123 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/",
+            "controller": "Home\\HomeController",
+            "action": "index",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/home",
+            "controller": "Home\\HomeController",
+            "action": "index",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/about",
+            "controller": "Home\\HomeController",
+            "action": "about",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/contact",
+            "controller": "Home\\HomeController",
+            "action": "contact",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/login",
+            "controller": "Auth\\AuthController",
+            "action": "login",
+            "middlewares": []
+        },
+        {
+            "method": "POST",
+            "path": "/login",
+            "controller": "Auth\\AuthController",
+            "action": "login",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/register",
+            "controller": "Auth\\AuthController",
+            "action": "register",
+            "middlewares": []
+        },
+        {
+            "method": "POST",
+            "path": "/register",
+            "controller": "Auth\\AuthController",
+            "action": "register",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/logout",
+            "controller": "Auth\\AuthController",
+            "action": "logout",
+            "middlewares": []
+        },
+        {
+            "method": "POST",
+            "path": "/logout",
+            "controller": "Auth\\AuthController",
+            "action": "logout",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/profile",
+            "controller": "Auth\\AuthController",
+            "action": "profile",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "POST",
+            "path": "/profile",
+            "controller": "Auth\\AuthController",
+            "action": "profile",
+            "middlewares": ["auth"]
+        },
+        {
+            "method": "GET",
+            "path": "/forgot-password",
+            "controller": "Auth\\AuthController",
+            "action": "forgotPassword",
+            "middlewares": []
+        },
+        {
+            "method": "POST",
+            "path": "/forgot-password",
+            "controller": "Auth\\AuthController",
+            "action": "forgotPassword",
+            "middlewares": []
+        },
+        {
+            "method": "GET",
+            "path": "/student",
+            "controller": "Student\\StudentController",
+            "action": "dashboard",
+            "middlewares": ["auth", "role:student"]
+        },
+        {
+            "method": "GET",
+            "path": "/instructor",
+            "controller": "Instructor\\InstructorController",
+            "action": "dashboard",
+            "middlewares": ["auth", "role:instructor"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin",
+            "controller": "Admin\\AdminController",
+            "action": "dashboard",
+            "middlewares": ["auth", "role:admin"]
+        }
+    ]
+}
