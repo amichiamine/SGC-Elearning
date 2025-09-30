@@ -33,60 +33,31 @@ class Autoloader
 
     public function loadClass($class)
     {
-        $prefix = $class;
-        
-        while (false !== $pos = strrpos($prefix, '\\')) {
-            $prefix = substr($class, 0, $pos + 1);
-            $relativeClass = substr($class, $pos + 1);
-            
-            $mappedFile = $this->loadMappedFile($prefix, $relativeClass);
-            if ($mappedFile) {
-                return $mappedFile;
+        // Parcourir les préfixes de namespace enregistrés
+        foreach ($this->prefixes as $prefix => $baseDirs) {
+            // Vérifier si le nom de la classe commence par le préfixe
+            $len = strlen($prefix);
+            if (strncmp($prefix, $class, $len) !== 0) {
+                // Non, passer au préfixe suivant
+                continue;
             }
-            
-            $prefix = rtrim($prefix, '\\');
-        }
-        
-        // Fallback pour compatibilité ascendante
-        return $this->loadLegacyClass($class);
-    }
 
-    protected function loadMappedFile($prefix, $relativeClass)
-    {
-        if (isset($this->prefixes[$prefix]) === false) {
-            return false;
-        }
-        
-        foreach ($this->prefixes[$prefix] as $baseDir) {
-            $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-            
-            if ($this->requireFile($file)) {
-                return $file;
+            // Obtenir le nom de la classe relative (ex: Application pour SGC\Core\Application)
+            $relativeClass = substr($class, $len);
+
+            // Remplacer les séparateurs de namespace par des séparateurs de répertoire
+            // dans le nom de la classe relative, et ajouter .php
+            $file = str_replace('\\', '/', $relativeClass) . '.php';
+
+            // Essayer de charger le fichier depuis les répertoires de base associés au préfixe
+            foreach ($baseDirs as $baseDir) {
+                $filePath = $baseDir . $file;
+                if ($this->requireFile($filePath)) {
+                    // Le fichier a été trouvé et inclus, on arrête
+                    return;
+                }
             }
         }
-        
-        return false;
-    }
-    
-    /**
-     * Chargement des classes legacy (avec constantes)
-     */
-    protected function loadLegacyClass($className)
-    {
-        $possiblePaths = [
-            VIEWS_PATH . '/' . $className . '.php',
-            CORE_PATH . '/' . $className . '.php',
-            BASE_PATH . '/controllers/' . $className . '.php',
-            BASE_PATH . '/models/' . $className . '.php'
-        ];
-        
-        foreach ($possiblePaths as $file) {
-            if ($this->requireFile($file)) {
-                return $file;
-            }
-        }
-        
-        return false;
     }
 
     protected function requireFile($file)
