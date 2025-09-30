@@ -1,0 +1,49 @@
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title"><?php echo htmlspecialchars($title ?? 'Gestion des Cours'); ?></h1>
+            <div class="page-actions">
+                <a href="/admin/courses/create" class="btn btn-primary">
+                    <span class="icon icon-add"></span>
+                    Ajouter un cours
+                </a>
+            </div>
+        </div>
+        <p>Liste de tous les cours de la plateforme.</p>
+
+        <div class="table-container clay-card">
+            <?php if (!empty($courses)): ?>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Date de création</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($courses as $course): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($course['id']); ?></td>
+                                <td><?php echo htmlspecialchars($course['title']); ?></td>
+                                <td><span class="badge status-<?php echo htmlspecialchars($course['status']); ?>"><?php echo htmlspecialchars($course['status']); ?></span></td>
+                                <td><?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($course['created_at']))); ?></td>
+                                <td class="actions">
+                                    <a href="/admin/courses/edit/<?php echo $course['id']; ?>" class="btn btn-sm btn-secondary">Éditer</a>
+                                    <form action="/admin/courses/delete/<?php echo $course['id']; ?>" method="POST" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $auth->generateCsrfToken(); ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce cours ?');">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="no-data">Aucun cours trouvé. <a href="/admin/courses/create">Créez le premier !</a></p>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>

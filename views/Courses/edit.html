@@ -1,0 +1,32 @@
+<section class="page-section">
+    <div class="container">
+        <h1 class="page-title"><?php echo htmlspecialchars($title ?? 'Modifier le cours'); ?></h1>
+        <p>Mettez à jour les informations du cours ci-dessous.</p>
+
+        <div class="form-container clay-card">
+            <form action="/admin/courses/update/<?php echo htmlspecialchars($course['id']); ?>" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $auth->generateCsrfToken(); ?>">
+                <div class="form-group">
+                    <label for="title">Titre du cours</label>
+                    <input type="text" id="title" name="title" class="form-control" value="<?php echo htmlspecialchars($course['title']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" rows="5" required><?php echo htmlspecialchars($course['description'] ?? ''); ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="status">Statut</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="draft" <?php echo ($course['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Brouillon</option>
+                        <option value="published" <?php echo ($course['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Publié</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                    <a href="/admin/courses" class="btn btn-outline">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

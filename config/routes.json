@@ -118,6 +118,48 @@
             "controller": "Admin\\AdminController",
             "action": "dashboard",
             "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses",
+            "controller": "Courses\\CourseController",
+            "action": "index",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses/create",
+            "controller": "Courses\\CourseController",
+            "action": "create",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses",
+            "controller": "Courses\\CourseController",
+            "action": "store",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "GET",
+            "path": "/admin/courses/edit/{id}",
+            "controller": "Courses\\CourseController",
+            "action": "edit",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses/update/{id}",
+            "controller": "Courses\\CourseController",
+            "action": "update",
+            "middlewares": ["auth", "role:admin"]
+        },
+        {
+            "method": "POST",
+            "path": "/admin/courses/delete/{id}",
+            "controller": "Courses\\CourseController",
+            "action": "destroy",
+            "middlewares": ["auth", "role:admin"]
         }
     ]
 }

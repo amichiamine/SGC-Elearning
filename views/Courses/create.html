@@ -1,0 +1,32 @@
+<section class="page-section">
+    <div class="container">
+        <h1 class="page-title"><?php echo htmlspecialchars($title ?? 'Créer un nouveau cours'); ?></h1>
+        <p>Remplissez les informations ci-dessous pour créer un nouveau cours.</p>
+
+        <div class="form-container clay-card">
+            <form action="/admin/courses" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $auth->generateCsrfToken(); ?>">
+                <div class="form-group">
+                    <label for="title">Titre du cours</label>
+                    <input type="text" id="title" name="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="status">Statut</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="draft">Brouillon</option>
+                        <option value="published">Publié</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Créer le cours</button>
+                    <a href="/admin/courses" class="btn btn-outline">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
