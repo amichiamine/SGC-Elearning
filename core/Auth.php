@@ -4,6 +4,7 @@ namespace SGC\Core;
 
 use SGC\Core\Database;
 use SGC\Core\Config;
+use SGC\Core\RoleManager;
 
 /**
  * Gestionnaire d'authentification pour SGC E-Learning
@@ -24,6 +25,7 @@ class Auth
         $this->config = Config::getInstance();
         $this->initializeSession();
         $this->loadCurrentUser();
+        RoleManager::loadRoles(); // Ensure roles are loaded
     }
 
     /**
@@ -275,11 +277,25 @@ class Auth
     }
 
     /**
+     * Get the role of the current user.
+     * Returns 'Guest' if not logged in.
+     *
+     * @return string
+     */
+    public function getRole(): string
+    {
+        if ($this->user && isset($this->user['role'])) {
+            return $this->user['role'];
+        }
+        return 'Guest';
+    }
+
+    /**
      * Vérifie si l'utilisateur a un rôle spécifique
      */
     public function hasRole($role)
     {
-        return $this->user && $this->user['role'] === $role;
+        return $this->getRole() === $role;
     }
 
     /**
@@ -287,7 +303,19 @@ class Auth
      */
     public function hasAnyRole($roles)
     {
-        return $this->user && in_array($this->user['role'], $roles);
+        return in_array($this->getRole(), $roles);
+    }
+
+    /**
+     * Check if the current user has a specific permission.
+     *
+     * @param string $permission The permission to check.
+     * @return bool
+     */
+    public function can(string $permission): bool
+    {
+        $role = $this->getRole();
+        return RoleManager::hasPermission($role, $permission);
     }
 
     /**
@@ -344,7 +372,7 @@ class Auth
                     $hashedPassword,
                     $data['first_name'] ?? '',
                     $data['last_name'] ?? '',
-                    'student' // rôle par défaut
+                    'Student' // Rôle par défaut
                 ]
             );
 
@@ -406,10 +434,27 @@ class Auth
     public function requireRole($role, $redirectUrl = '/')
     {
         if (!$this->hasRole($role)) {
+            http_response_code(403);
             header("Location: " . WEB_ROOT . $redirectUrl);
             exit;
         }
     }
+
+    /**
+     * Middleware to require a specific permission.
+     *
+     * @param string $permission The required permission.
+     * @param string $redirectUrl The URL to redirect to on failure.
+     */
+    public function requirePermission(string $permission, $redirectUrl = '/')
+    {
+        if (!$this->can($permission)) {
+            http_response_code(403);
+            header("Location: " . WEB_ROOT . $redirectUrl);
+            exit;
+        }
+    }
+
 
     // Alias pour compatibilité
     public function isAuthenticated() { return $this->isLoggedIn(); }

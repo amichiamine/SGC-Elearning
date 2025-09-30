@@ -1,32 +1,165 @@
 <section class="page-section">
     <div class="container">
-        <h1 class="page-title"><?php echo htmlspecialchars($title ?? 'Modifier le cours'); ?></h1>
-        <p>Mettez à jour les informations du cours ci-dessous.</p>
+        <h1 class="page-title"><?= htmlspecialchars($title ?? 'Modifier le cours'); ?></h1>
+        <p>Mettez à jour les informations du cours et organisez sa structure ci-dessous.</p>
 
-        <div class="form-container clay-card">
-            <form action="/admin/courses/update/<?php echo htmlspecialchars($course['id']); ?>" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo $auth->generateCsrfToken(); ?>">
+        <!-- Form to Edit Course Details -->
+        <div class="form-container clay-card mb-large">
+            <h2>Détails du Cours</h2>
+            <form action="/courses/update/<?= htmlspecialchars($course['id']); ?>" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
                 <div class="form-group">
                     <label for="title">Titre du cours</label>
-                    <input type="text" id="title" name="title" class="form-control" value="<?php echo htmlspecialchars($course['title']); ?>" required>
+                    <input type="text" id="title" name="title" class="form-control" value="<?= htmlspecialchars($course['title']); ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea id="description" name="description" class="form-control" rows="5" required><?php echo htmlspecialchars($course['description'] ?? ''); ?></textarea>
+                    <textarea id="description" name="description" class="form-control" rows="5" required><?= htmlspecialchars($course['description'] ?? ''); ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Catégorie</label>
+                    <input type="text" id="category" name="category" class="form-control" value="<?= htmlspecialchars($course['category'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="level">Niveau</label>
+                    <select id="level" name="level" class="form-control">
+                        <option value="Débutant" <?= ($course['level'] ?? '') === 'Débutant' ? 'selected' : ''; ?>>Débutant</option>
+                        <option value="Intermédiaire" <?= ($course['level'] ?? '') === 'Intermédiaire' ? 'selected' : ''; ?>>Intermédiaire</option>
+                        <option value="Avancé" <?= ($course['level'] ?? '') === 'Avancé' ? 'selected' : ''; ?>>Avancé</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="status">Statut</label>
                     <select id="status" name="status" class="form-control">
-                        <option value="draft" <?php echo ($course['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Brouillon</option>
-                        <option value="published" <?php echo ($course['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Publié</option>
+                        <option value="draft" <?= ($course['status'] ?? '') === 'draft' ? 'selected' : ''; ?>>Brouillon</option>
+                        <option value="published" <?= ($course['status'] ?? '') === 'published' ? 'selected' : ''; ?>>Publié</option>
+                        <option value="archived" <?= ($course['status'] ?? '') === 'archived' ? 'selected' : ''; ?>>Archivé</option>
                     </select>
                 </div>
-
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
-                    <a href="/admin/courses" class="btn btn-outline">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Mettre à jour les détails</button>
                 </div>
             </form>
         </div>
+
+        <!-- Course Materials Management -->
+        <div class="materials-container clay-card mb-large">
+            <h2>Matériel Pédagogique du Cours</h2>
+            <ul>
+                <?php foreach ($course_materials as $material): ?>
+                    <li><a href="/<?= htmlspecialchars($material['file_path']) ?>" target="_blank"><?= htmlspecialchars($material['title']) ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+            <form action="/courses/uploadMaterial/<?= $course['id'] ?>/0" method="POST" enctype="multipart/form-data" class="clay-card-inset">
+                <h4>Ajouter du matériel au cours</h4>
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+                <div class="form-group">
+                    <label for="material_title_course">Titre du matériel</label>
+                    <input type="text" id="material_title_course" name="title" class="form-control" placeholder="Ex: Syllabus complet">
+                </div>
+                <div class="form-group">
+                    <label for="material_file_course">Fichier</label>
+                    <input type="file" id="material_file_course" name="material" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-sm">Télécharger</button>
+            </form>
+        </div>
+
+        <!-- Course Structure Management -->
+        <div class="structure-container">
+            <h2>Structure du Cours</h2>
+            <?php foreach ($modules as $module): ?>
+                <div class="clay-card module-card mb-medium">
+                    <h3 class="module-title"><?= htmlspecialchars($module['title']); ?></h3>
+
+                    <ul class="lesson-list">
+                        <?php foreach ($module['lessons'] as $lesson): ?>
+                            <li class="lesson-item clay-card-inset">
+                                <strong><?= htmlspecialchars($lesson['title']); ?></strong> (<i><?= htmlspecialchars($lesson['content_type']); ?></i>)
+                                <?php if ($lesson['content_type'] === 'live_session' && !empty($lesson['session_datetime'])): ?>
+                                    <div class="session-info">
+                                        <small>Prévu le: <?= date('d/m/Y à H:i', strtotime($lesson['session_datetime'])) ?> | <a href="<?= htmlspecialchars($lesson['session_url']) ?>" target="_blank">Lien de la session</a></small>
+                                    </div>
+                                <?php endif; ?>
+                                <ul class="material-list">
+                                    <?php foreach ($lesson['materials'] as $material): ?>
+                                        <li><a href="/<?= htmlspecialchars($material['file_path']) ?>" target="_blank"><?= htmlspecialchars($material['title']) ?></a></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <form action="/courses/uploadMaterial/<?= $course['id'] ?>/<?= $lesson['id'] ?>" method="POST" enctype="multipart/form-data" class="add-material-form">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+                                    <div class="form-group-sm">
+                                        <input type="file" name="material" class="form-control-sm" required>
+                                        <button type="submit" class="btn btn-tertiary btn-sm">Ajouter Fichier</button>
+                                    </div>
+                                </form>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+
+                    <!-- Form to Add a New Lesson to this Module -->
+                    <form action="/courses/addLesson/<?= $course['id'] ?>/<?= $module['id'] ?>" method="POST" class="add-lesson-form clay-card-inset mt-medium" data-module-id="<?= $module['id'] ?>">
+                         <h4>Ajouter une leçon à "<?= htmlspecialchars($module['title']); ?>"</h4>
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+                        <div class="form-group">
+                            <label for="lesson_title_<?= $module['id'] ?>">Titre de la leçon</label>
+                            <input type="text" id="lesson_title_<?= $module['id'] ?>" name="title" class="form-control" placeholder="Ex: Introduction à..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="content_type_<?= $module['id'] ?>">Type de contenu</label>
+                            <select id="content_type_<?= $module['id'] ?>" name="content_type" class="form-control content-type-select">
+                                <option value="text">Texte</option>
+                                <option value="video">Vidéo</option>
+                                <option value="live_session">Session Live</option>
+                                <option value="quiz">Quiz</option>
+                                <option value="file">Fichier</option>
+                            </select>
+                        </div>
+                        <div class="live-session-fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="session_url_<?= $module['id'] ?>">URL de la session (Meet, Zoom, etc.)</label>
+                                <input type="url" id="session_url_<?= $module['id'] ?>" name="session_url" class="form-control" placeholder="https://meet.google.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="session_datetime_<?= $module['id'] ?>">Date et heure</label>
+                                <input type="datetime-local" id="session_datetime_<?= $module['id'] ?>" name="session_datetime" class="form-control">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary btn-sm">Ajouter Leçon</button>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+
+            <!-- Form to Add a New Module -->
+            <div class="form-container clay-card mt-large">
+                 <h2>Ajouter un nouveau module</h2>
+                <form action="/courses/addModule/<?= htmlspecialchars($course['id']); ?>" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+                    <div class="form-group">
+                        <label for="module_title">Titre du module</label>
+                        <input type="text" id="module_title" name="title" class="form-control" placeholder="Ex: Module 1 - Les bases" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Ajouter Module</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.content-type-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const form = this.closest('form');
+            const liveSessionFields = form.querySelector('.live-session-fields');
+            if (this.value === 'live_session') {
+                liveSessionFields.style.display = 'block';
+            } else {
+                liveSessionFields.style.display = 'none';
+            }
+        });
+    });
+});
+</script>

@@ -1,0 +1,15 @@
+/* ==========================================================================
+   Student Layout Styles
+   - Specific styles for the student dashboard.
+   ========================================================================== */
+
+.student-dashboard {
+    /* Styles for the main student dashboard container */
+}
+
+.student-course-list {
+    /* Styles for the list of enrolled courses */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-medium);
+}

@@ -1,0 +1,39 @@
+{
+  "roles": {
+    "Super Admin": {
+      "permissions": ["*"]
+    },
+    "Admin": {
+      "permissions": [
+        "admin.dashboard.view",
+        "admin.users.manage",
+        "admin.roles.manage",
+        "admin.settings.manage",
+        "admin.courses.manage"
+      ]
+    },
+    "Instructor": {
+      "permissions": [
+        "instructor.dashboard.view",
+        "courses.create",
+        "courses.edit.own",
+        "courses.delete.own",
+        "courses.view.own",
+        "instructor.students.manage"
+      ]
+    },
+    "Student": {
+      "permissions": [
+        "student.dashboard.view",
+        "courses.view.enrolled",
+        "student.progress.view"
+      ]
+    },
+    "Guest": {
+      "permissions": [
+        "home.view",
+        "courses.view.public"
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+/* ==========================================================================
+   Admin Layout Styles
+   - Specific styles for the administrator dashboard.
+   - Overrides and extends base layout styles.
+   ========================================================================== */
+
+.admin-sidebar {
+    /* Styles for the admin navigation sidebar */
+    width: 250px;
+    background-color: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+}
+
+.admin-main-content {
+    /* Styles for the main content area in the admin panel */
+    padding: var(--spacing-large);
+}

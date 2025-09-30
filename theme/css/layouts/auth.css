@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Authentication Layout Styles
+   - Specific styles for login, registration, and other auth pages.
+   ========================================================================== */
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-light-gray);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--spacing-large);
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-clay-deep);
+}

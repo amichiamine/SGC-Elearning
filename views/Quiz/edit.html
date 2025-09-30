@@ -1,0 +1,100 @@
+<section class="page-section">
+    <div class="container">
+        <h1 class="page-title"><?= htmlspecialchars($title ?? 'Modifier le Quiz'); ?></h1>
+        <p>Gérez les questions et les réponses pour ce quiz.</p>
+
+        <!-- Display Existing Questions -->
+        <div class="existing-questions clay-card mb-large">
+            <h2>Questions Actuelles</h2>
+            <?php if (empty($questions)): ?>
+                <p>Ce quiz n'a pas encore de questions.</p>
+            <?php else: ?>
+                <ol>
+                    <?php foreach ($questions as $question): ?>
+                        <li class="mb-medium">
+                            <strong><?= htmlspecialchars($question['question_text']); ?></strong>
+                            <ul>
+                                <?php foreach ($question['choices'] as $choice): ?>
+                                    <li class="<?= $choice['is_correct'] ? 'correct-answer' : ''; ?>">
+                                        <?= htmlspecialchars($choice['choice_text']); ?>
+                                        <?= $choice['is_correct'] ? ' (Correct)' : ''; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php endif; ?>
+        </div>
+
+        <!-- Form to Add a New Question -->
+        <div class="form-container clay-card">
+            <h2>Ajouter une nouvelle question</h2>
+            <form action="/quiz/addQuestion/<?= htmlspecialchars($quiz['id']); ?>" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token); ?>">
+                <div class="form-group">
+                    <label for="question_text">Texte de la question</label>
+                    <textarea id="question_text" name="question_text" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div id="choices-container">
+                    <label>Choix de réponses</label>
+                    <!-- Choices will be added here dynamically -->
+                </div>
+
+                <button type="button" id="add-choice-btn" class="btn btn-secondary btn-sm mt-small">Ajouter un choix</button>
+
+                <div class="form-actions mt-large">
+                    <button type="submit" class="btn btn-primary">Ajouter la question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<style>
+    .correct-answer {
+        color: green;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addChoiceBtn = document.getElementById('add-choice-btn');
+    const choicesContainer = document.getElementById('choices-container');
+    let choiceCounter = 0;
+
+    function addChoiceInput() {
+        const choiceWrapper = document.createElement('div');
+        choiceWrapper.className = 'form-group d-flex align-items-center';
+
+        const radioInput = document.createElement('input');
+        radioInput.type = 'radio';
+        radioInput.name = 'is_correct';
+        radioInput.value = choiceCounter;
+        radioInput.className = 'mr-small';
+        if (choiceCounter === 0) {
+            radioInput.checked = true; // Default check the first one
+        }
+
+        const textInput = document.createElement('input');
+        textInput.type = 'text';
+        textInput.name = `choices[${choiceCounter}]`;
+        textInput.className = 'form-control';
+        textInput.placeholder = `Choix ${choiceCounter + 1}`;
+
+        choiceWrapper.appendChild(radioInput);
+        choiceWrapper.appendChild(textInput);
+        choicesContainer.appendChild(choiceWrapper);
+
+        choiceCounter++;
+    }
+
+    addChoiceBtn.addEventListener('click', addChoiceInput);
+
+    // Add a few choices by default
+    addChoiceInput();
+    addChoiceInput();
+});
+</script>

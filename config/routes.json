@@ -4,162 +4,111 @@
             "method": "GET",
             "path": "/",
             "controller": "Home\\HomeController",
-            "action": "index",
-            "middlewares": []
-        },
-        {
-            "method": "GET",
-            "path": "/home",
-            "controller": "Home\\HomeController",
-            "action": "index",
-            "middlewares": []
-        },
-        {
-            "method": "GET",
-            "path": "/about",
-            "controller": "Home\\HomeController",
-            "action": "about",
-            "middlewares": []
-        },
-        {
-            "method": "GET",
-            "path": "/contact",
-            "controller": "Home\\HomeController",
-            "action": "contact",
-            "middlewares": []
+            "action": "index"
         },
         {
             "method": "GET",
             "path": "/login",
             "controller": "Auth\\AuthController",
-            "action": "login",
-            "middlewares": []
+            "action": "login"
         },
         {
             "method": "POST",
             "path": "/login",
             "controller": "Auth\\AuthController",
-            "action": "login",
-            "middlewares": []
+            "action": "login"
         },
         {
             "method": "GET",
             "path": "/register",
             "controller": "Auth\\AuthController",
-            "action": "register",
-            "middlewares": []
+            "action": "register"
         },
         {
             "method": "POST",
             "path": "/register",
             "controller": "Auth\\AuthController",
-            "action": "register",
-            "middlewares": []
+            "action": "register"
         },
         {
             "method": "GET",
             "path": "/logout",
             "controller": "Auth\\AuthController",
-            "action": "logout",
-            "middlewares": []
-        },
-        {
-            "method": "POST",
-            "path": "/logout",
-            "controller": "Auth\\AuthController",
-            "action": "logout",
-            "middlewares": []
+            "action": "logout"
         },
         {
             "method": "GET",
             "path": "/profile",
             "controller": "Auth\\AuthController",
-            "action": "profile",
-            "middlewares": ["auth"]
+            "action": "profile"
+        },
+        {
+            "method": "GET",
+            "path": "/student/dashboard",
+            "controller": "Student\\DashboardController",
+            "action": "index"
+        },
+        {
+            "method": "GET",
+            "path": "/instructor/dashboard",
+            "controller": "Instructor\\DashboardController",
+            "action": "index"
+        },
+        {
+            "method": "GET",
+            "path": "/admin/dashboard",
+            "controller": "Admin\\DashboardController",
+            "action": "index"
+        },
+
+        // --- New Course Management Routes ---
+        {
+            "method": "GET",
+            "path": "/courses",
+            "controller": "Courses\\CourseController",
+            "action": "index"
+        },
+        {
+            "method": "GET",
+            "path": "/courses/create",
+            "controller": "Courses\\CourseController",
+            "action": "create"
         },
         {
             "method": "POST",
-            "path": "/profile",
-            "controller": "Auth\\AuthController",
-            "action": "profile",
-            "middlewares": ["auth"]
+            "path": "/courses/store",
+            "controller": "Courses\\CourseController",
+            "action": "store"
         },
         {
             "method": "GET",
-            "path": "/forgot-password",
-            "controller": "Auth\\AuthController",
-            "action": "forgotPassword",
-            "middlewares": []
+            "path": "/courses/edit/{id}",
+            "controller": "Courses\\CourseController",
+            "action": "edit"
         },
         {
             "method": "POST",
-            "path": "/forgot-password",
-            "controller": "Auth\\AuthController",
-            "action": "forgotPassword",
-            "middlewares": []
-        },
-        {
-            "method": "GET",
-            "path": "/student",
-            "controller": "Student\\StudentController",
-            "action": "dashboard",
-            "middlewares": ["auth", "role:student"]
-        },
-        {
-            "method": "GET",
-            "path": "/instructor",
-            "controller": "Instructor\\InstructorController",
-            "action": "dashboard",
-            "middlewares": ["auth", "role:instructor"]
-        },
-        {
-            "method": "GET",
-            "path": "/admin",
-            "controller": "Admin\\AdminController",
-            "action": "dashboard",
-            "middlewares": ["auth", "role:admin"]
-        },
-        {
-            "method": "GET",
-            "path": "/admin/courses",
+            "path": "/courses/update/{id}",
             "controller": "Courses\\CourseController",
-            "action": "index",
-            "middlewares": ["auth", "role:admin"]
-        },
-        {
-            "method": "GET",
-            "path": "/admin/courses/create",
-            "controller": "Courses\\CourseController",
-            "action": "create",
-            "middlewares": ["auth", "role:admin"]
+            "action": "update"
         },
         {
             "method": "POST",
-            "path": "/admin/courses",
+            "path": "/courses/addModule/{id}",
             "controller": "Courses\\CourseController",
-            "action": "store",
-            "middlewares": ["auth", "role:admin"]
-        },
-        {
-            "method": "GET",
-            "path": "/admin/courses/edit/{id}",
-            "controller": "Courses\\CourseController",
-            "action": "edit",
-            "middlewares": ["auth", "role:admin"]
+            "action": "addModule"
         },
         {
             "method": "POST",
-            "path": "/admin/courses/update/{id}",
+            "path": "/courses/addLesson/{course_id}/{module_id}",
             "controller": "Courses\\CourseController",
-            "action": "update",
-            "middlewares": ["auth", "role:admin"]
+            "action": "addLesson"
         },
         {
             "method": "POST",
-            "path": "/admin/courses/delete/{id}",
+            "path": "/courses/uploadMaterial/{course_id}/{lesson_id}",
             "controller": "Courses\\CourseController",
-            "action": "destroy",
-            "middlewares": ["auth", "role:admin"]
+            "action": "uploadMaterial"
         }
     ]
 }

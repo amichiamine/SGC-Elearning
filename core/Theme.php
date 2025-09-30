@@ -86,14 +86,26 @@ class Theme
      */
     public function getCSSAssets(): array
     {
+        // The order is important: reset -> variables -> base styles -> components -> layout -> responsive.
         return [
-            THEME_PATH . '/css/variables.css',
+            // Base and reset
             THEME_PATH . '/css/reset.css',
+            THEME_PATH . '/css/variables.css',
+
+            // Main theme style
             THEME_PATH . '/css/claymorphism.css',
+
+            // Component styles
             THEME_PATH . '/css/components/buttons.css',
             THEME_PATH . '/css/components/forms.css',
             THEME_PATH . '/css/components/cards.css',
-            THEME_PATH . '/icons/icons.css'
+            // THEME_PATH . '/icons/icons.css', // This file does not exist yet
+
+            // Base layout styles
+            THEME_PATH . '/css/layouts/base.css',
+
+            // Responsive styles (should be loaded last)
+            THEME_PATH . '/css/responsive.css'
         ];
     }
 
