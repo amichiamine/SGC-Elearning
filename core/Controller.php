@@ -34,6 +34,34 @@ abstract class Controller
     }
 
     /**
+     * Renders a view within the main base template.
+     * This is the standard method for rendering pages with a consistent layout.
+     *
+     * @param string $viewPath The path to the partial view file relative to the `views` directory.
+     * @param array $data The data to pass to the view.
+     * @param string $layout The base layout to use.
+     */
+    protected function renderView(string $viewPath, array $data = [], string $layout = 'theme/templates/base'): void
+    {
+        // Add theme and auth objects to data, as they are globally useful in views.
+        $data['theme'] = $this->theme;
+        $data['auth'] = $this->auth;
+
+        // Render the partial view content into a variable.
+        ob_start();
+        extract($data);
+        include VIEWS_PATH . "/{$viewPath}";
+        $content = ob_get_clean();
+
+        // Prepare data for the base template.
+        $layoutData = $data;
+        $layoutData['content'] = $content;
+
+        // Render the base template with the content.
+        $this->render($layout, $layoutData);
+    }
+
+    /**
      * Méthode de rendu de vue simplifiée.
      * Les contrôleurs enfants peuvent l'utiliser pour rendre un template.
      *

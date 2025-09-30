@@ -1,0 +1,42 @@
+<section class="page-section admin-dashboard">
+    <div class="container">
+        <h1 class="page-title"><?= htmlspecialchars($title ?? 'Gestion des Utilisateurs') ?></h1>
+        <p>Liste de tous les utilisateurs enregistrés sur la plateforme.</p>
+
+        <div class="table-container clay-card">
+            <?php if (!empty($users)): ?>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom d'utilisateur</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Date de création</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($user['id']) ?></td>
+                                <td><?= htmlspecialchars($user['username']) ?></td>
+                                <td><?= htmlspecialchars($user['email']) ?></td>
+                                <td><span class="badge role-<?= htmlspecialchars($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span></td>
+                                <td><span class="badge status-<?= htmlspecialchars($user['status']) ?>"><?= htmlspecialchars($user['status']) ?></span></td>
+                                <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($user['created_at']))) ?></td>
+                                <td class="actions">
+                                    <a href="/admin/users/edit/<?= $user['id'] ?>" class="btn btn-sm btn-secondary">Éditer</a>
+                                    <a href="/admin/users/delete/<?= $user['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="no-data">Aucun utilisateur trouvé.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
