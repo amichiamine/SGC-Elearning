@@ -6,6 +6,11 @@ use SGC\Core\Controller;
 
 class HomeController extends Controller
 {
+    public function __construct(\SGC\Core\Container $container)
+    {
+        parent::__construct($container);
+    }
+
     /**
      * Display the main home page.
      */

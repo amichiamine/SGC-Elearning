@@ -10,7 +10,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // --- Définition des constantes de chemin ---
-define('BASE_PATH', __DIR__);
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', __DIR__);
+}
 define('CONFIG_PATH', BASE_PATH . '/config');
 define('CORE_PATH', BASE_PATH . '/core');
 define('VIEWS_PATH', BASE_PATH . '/views');
@@ -32,20 +34,20 @@ $autoloader->register();
 $container = new SGC\Core\Container();
 
 // --- Enregistrement des services dans le conteneur ---
-// Lie le conteneur à lui-même pour qu'il puisse s'auto-injecter.
 $container->singleton(SGC\Core\Container::class, function () use ($container) {
     return $container;
 });
+
 $container->singleton(SGC\Core\Config::class, function () {
     return SGC\Core\Config::getInstance();
 });
 
-$container->singleton(SGC\Core\Database::class, function ($c) {
+$container->singleton(SGC\Core\Database::class, function () {
     return SGC\Core\Database::getInstance();
 });
 
 $container->singleton(SGC\Core\Auth::class, function ($c) {
-    return new SGC\Core\Auth();
+    return new SGC\Core\Auth($c->make(SGC\Core\Database::class));
 });
 
 $container->singleton(SGC\Core\Theme::class);

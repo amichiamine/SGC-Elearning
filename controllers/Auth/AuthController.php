@@ -2,25 +2,17 @@
 
 namespace SGC\Controllers\Auth;
 
-use SGC\Core\Auth;
-use SGC\Core\View;
-use SGC\Core\Theme;
+use SGC\Core\Controller;
 
 /**
  * Contrôleur d'authentification pour SGC E-Learning
  * Gère les pages de connexion, inscription et déconnexion
  */
-class AuthController
+class AuthController extends Controller
 {
-    private $auth;
-    private $view;
-    private $theme;
-
-    public function __construct()
+    public function __construct(\SGC\Core\Container $container)
     {
-        $this->auth = new Auth();
-        $this->view = new View();
-        $this->theme = new Theme();
+        parent::__construct($container);
     }
 
     /**

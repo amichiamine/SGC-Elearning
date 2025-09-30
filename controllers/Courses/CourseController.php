@@ -49,7 +49,7 @@ class CourseController extends Controller
                 // CSRF token is invalid, abort
                 // Optionally, add an error message
                 $this->redirect('/admin/courses');
-                exit;
+                return;
             }
 
             $data = [
@@ -97,7 +97,7 @@ class CourseController extends Controller
             if (!$this->auth->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                 // CSRF token is invalid, abort
                 $this->redirect('/admin/courses');
-                exit;
+                return;
             }
 
             $data = [
@@ -124,7 +124,7 @@ class CourseController extends Controller
             if (!$this->auth->verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                 // CSRF token is invalid, abort
                 $this->redirect('/admin/courses');
-                exit;
+                return;
             }
              $this->courseModel->delete($id);
         }
